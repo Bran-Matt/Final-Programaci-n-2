@@ -34,6 +34,7 @@ Para ello:
 - Especifique la forma en que los objetos deben interactuar entre sí para cumplir con los
 requerimientos del sistema
 - Usar una base de datos
+- Solo podes usar minimo 2 framework
 - Que sea una aplicacion web
 
 El sistema deberá utilizar abstracción, encapsulamiento, herencia, polimorfismo y persistencia
