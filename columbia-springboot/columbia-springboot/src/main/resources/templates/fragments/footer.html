@@ -1,15 +1,59 @@
 <!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
--->
-<html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        <div>TODO write content</div>
-    </body>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <footer th:fragment="footer" class="footer mt-auto py-3 bg-dark text-white">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <h6><i class="fas fa-plane"></i> Columbia Viajes</h6>
+                    <p class="small">Sistema de Gestión de Agencias de Viajes</p>
+                    <p class="small text-muted">Versión 2.0 - Spring Boot</p>
+                </div>
+                <div class="col-md-4">
+                    <h6>Contacto</h6>
+                    <p class="small mb-1">
+                        <i class="fas fa-envelope me-1"></i> info@columbiaviajes.com.ar
+                    </p>
+                    <p class="small mb-1">
+                        <i class="fas fa-phone me-1"></i> 0800-345-6789
+                    </p>
+                    <p class="small">
+                        <i class="fas fa-globe me-1"></i> www.columbiaviajes.com.ar
+                    </p>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <h6>Sistema</h6>
+                    <p class="small mb-1">
+                        <i class="fas fa-clock me-1"></i> 
+                        <span class="live-clock"></span>
+                    </p>
+                    <p class="small mb-1">
+                        <i class="fas fa-database me-1"></i> 
+                        <span th:if="${session.usuario}" th:text="'Usuario: ' + ${session.usuario.codigoUsuario}">Usuario: admin</span>
+                        <span th:unless="${session.usuario}">No autenticado</span>
+                    </p>
+                    <p class="small">
+                        <i class="fas fa-code me-1"></i> 
+                        Desarrollado con Spring Boot, Hibernate y Bootstrap
+                    </p>
+                </div>
+            </div>
+            <hr class="my-2">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="small mb-0">
+                        &copy; 2024 Columbia Viajes. Todos los derechos reservados.
+                    </p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="small mb-0">
+                        <a th:href="@{/}" class="text-white text-decoration-none me-3">Inicio</a>
+                        <a href="#" class="text-white text-decoration-none me-3">Términos</a>
+                        <a href="#" class="text-white text-decoration-none">Privacidad</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
 </html>

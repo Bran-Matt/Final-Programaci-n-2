@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Vendedor - Clientes</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="position-sticky pt-3">
+                    <div class="sidebar-header">
+                        <h4><i class="fas fa-user-tie me-2"></i>Vendedor</h4>
+                    </div>
+                    <ul class="sidebar-menu">
+                        <li><a th:href="@{/vendedor/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li class="active"><a th:href="@{/vendedor/clientes}"><i class="fas fa-user-friends"></i> Mis Clientes</a></li>
+                        <li><a th:href="@{/vendedor/clientes/nuevo}"><i class="fas fa-user-plus"></i> Nuevo Cliente</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between pt-3 pb-2 mb-3 border-bottom">
+                    <h1><i class="fas fa-user-friends me-2"></i>Mis Clientes</h1>
+                    <div>
+                        <a th:href="@{/vendedor/clientes/nuevo}" class="btn btn-primary">
+                            <i class="fas fa-user-plus"></i> Nuevo Cliente
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                                    <input type="text" class="form-control" placeholder="Buscar cliente...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select">
+                                    <option>Todas las sucursales</option>
+                                    <option>Sucursal 103</option>
+                                    <option>Sucursal 117</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select">
+                                    <option>Todos los destinos</option>
+                                    <option>Montevideo</option>
+                                    <option>Seul</option>
+                                    <option>Paris</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-outline-primary w-100">Filtrar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Clients Table -->
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-list me-2"></i> Listado de Clientes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Cliente</th>
+                                        <th>Contacto</th>
+                                        <th>Viaje</th>
+                                        <th>Hotel</th>
+                                        <th>Total</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="cliente : ${clientes}">
+                                        <td th:text="${cliente.codigoUsuario}">15</td>
+                                        <td>
+                                            <strong th:text="${cliente.nombre} + ' ' + ${cliente.apellido}">Lautaro Gonzalez</strong><br>
+                                            <small th:text="${cliente.sucursalAsignada.codigo}" class="text-muted">Sucursal 103</small>
+                                        </td>
+                                        <td>
+                                            <small th:text="${cliente.email}">uriherman@hotmail.com</small><br>
+                                            <small th:text="${cliente.telefono}">011 2376 5364</small>
+                                        </td>
+                                        <td>
+                                            <span th:if="${cliente.vueloAsignado}">
+                                                <small th:text="${cliente.vueloAsignado.origen} + ' → ' + ${cliente.vueloAsignado.destino}">Montevideo → Paris</small><br>
+                                                <small th:text="${cliente.vueloAsignado.fecha}">04/01/2024</small>
+                                            </span>
+                                            <span th:unless="${cliente.vueloAsignado}" class="text-muted">Sin vuelo</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${cliente.hotelAsignado}">
+                                                <small th:text="${cliente.hotelAsignado.nombre}">La Estrella</small><br>
+                                                <small th:text="${cliente.hotelAsignado.ciudad}">Montevideo</small>
+                                            </span>
+                                            <span th:unless="${cliente.hotelAsignado}" class="text-muted">Sin hotel</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${cliente.vueloAsignado && cliente.hotelAsignado}" 
+                                                  th:text="'$' + ${cliente.vueloAsignado.precio + cliente.hotelAsignado.precio}"
+                                                  class="badge bg-success">$920.00</span>
+                                            <span th:unless="${cliente.vueloAsignado && cliente.hotelAsignado}" 
+                                                  class="badge bg-secondary">Sin calcular</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">Activo</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-info" title="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-outline-warning" title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-outline-danger" title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

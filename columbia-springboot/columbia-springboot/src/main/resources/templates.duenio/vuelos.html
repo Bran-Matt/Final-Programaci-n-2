@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dueño - Vuelos</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="position-sticky pt-3">
+                    <div class="sidebar-header">
+                        <h4><i class="fas fa-crown me-2"></i>Dueño</h4>
+                    </div>
+                    <ul class="sidebar-menu">
+                        <li><a th:href="@{/duenio/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a th:href="@{/duenio/sucursales}"><i class="fas fa-store"></i> Sucursales</a></li>
+                        <li class="active"><a th:href="@{/duenio/vuelos}"><i class="fas fa-plane"></i> Vuelos</a></li>
+                        <li><a th:href="@{/duenio/hoteles}"><i class="fas fa-hotel"></i> Hoteles</a></li>
+                        <li><a th:href="@{/duenio/vendedores}"><i class="fas fa-users"></i> Vendedores</a></li>
+                        <li><a th:href="@{/duenio/administradores}"><i class="fas fa-user-shield"></i> Administradores</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between pt-3 pb-2 mb-3 border-bottom">
+                    <h1><i class="fas fa-plane me-2"></i>Gestión de Vuelos</h1>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAgregarVuelo">
+                        <i class="fas fa-plus"></i> Nuevo Vuelo
+                    </button>
+                </div>
+
+                <!-- Filtros -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <input type="text" class="form-control" placeholder="Buscar vuelo...">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select">
+                                    <option>Todos los destinos</option>
+                                    <option>Paris, Francia</option>
+                                    <option>Seul, Corea del Sur</option>
+                                    <option>Mendoza, Argentina</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <input type="date" class="form-control" placeholder="Fecha">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select">
+                                    <option>Todos los estados</option>
+                                    <option>Programado</option>
+                                    <option>En Vuelo</option>
+                                    <option>Aterrizado</option>
+                                    <option>Cancelado</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vuelos Table -->
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-list me-2"></i> Listado de Vuelos</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th># Vuelo</th>
+                                        <th>Ruta</th>
+                                        <th>Fechas</th>
+                                        <th>Plazas</th>
+                                        <th>Precios</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="vuelo : ${vuelos}">
+                                        <td>
+                                            <strong th:text="${vuelo.numeroVuelo}">1</strong>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <span th:text="${vuelo.origen}">Montevideo</span> 
+                                                <i class="fas fa-long-arrow-alt-right mx-2"></i>
+                                                <span th:text="${vuelo.destino}">Paris</span>
+                                            </div>
+                                            <small class="text-muted" th:text="${vuelo.aerolinea}">Columbia Airlines</small>
+                                        </td>
+                                        <td>
+                                            <div><strong>Salida:</strong> <span th:text="${vuelo.fechaSalida}">04/01/2024 08:00</span></div>
+                                            <div><strong>Llegada:</strong> <span th:text="${vuelo.fechaLlegada}">04/01/2024 20:00</span></div>
+                                            <small class="text-muted" th:text="${vuelo.duracionMinutos} + ' min'">720 min</small>
+                                        </td>
+                                        <td>
+                                            <div class="mb-1">
+                                                <small>Totales: </small>
+                                                <span class="badge bg-info" th:text="${vuelo.plazasTotales}">150</span>
+                                            </div>
+                                            <div class="mb-1">
+                                                <small>Turista: </small>
+                                                <span class="badge bg-success" th:text="${vuelo.plazasTurista}">120</span>
+                                            </div>
+                                            <div>
+                                                <small>Primera: </small>
+                                                <span class="badge bg-warning" th:text="${vuelo.plazasPrimera}">30</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="mb-1">
+                                                <small>Turista: </small>
+                                                <span class="badge bg-secondary" th:text="'$' + ${vuelo.precioTurista}">$800.00</span>
+                                            </div>
+                                            <div>
+                                                <small>Primera: </small>
+                                                <span class="badge bg-dark" th:text="'$' + ${vuelo.precioPrimera}">$1,500.00</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span th:switch="${vuelo.estado}" class="badge">
+                                                <span th:case="'PROGRAMADO'" class="badge bg-primary">Programado</span>
+                                                <span th:case="'EN_VUELO'" class="badge bg-info">En Vuelo</span>
+                                                <span th:case="'ATERRIZADO'" class="badge bg-success">Aterrizado</span>
+                                                <span th:case="'CANCELADO'" class="badge bg-danger">Cancelado</span>
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-info">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-outline-warning">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modal Agregar Vuelo -->
+    <div class="modal fade" id="modalAgregarVuelo" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title"><i class="fas fa-plane"></i> Nuevo Vuelo</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <form th:action="@{/duenio/vuelos}" th:object="${vuelo}" method="post">
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Número de Vuelo *</label>
+                                <input type="number" class="form-control" th:field="*{numeroVuelo}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Aerolínea</label>
+                                <input type="text" class="form-control" name="aerolinea" value="Columbia Airlines">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Origen *</label>
+                                <input type="text" class="form-control" th:field="*{origen}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Destino *</label>
+                                <input type="text" class="form-control" th:field="*{destino}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha Salida *</label>
+                                <input type="datetime-local" class="form-control" name="fechaSalida" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Fecha Llegada *</label>
+                                <input type="datetime-local" class="form-control" name="fechaLlegada" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Plazas Totales *</label>
+                                <input type="number" class="form-control" th:field="*{plazasTotales}" required min="1">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Plazas Turista *</label>
+                                <input type="number" class="form-control" th:field="*{plazasTurista}" required>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label">Plazas Primera *</label>
+                                <input type="number" class="form-control" name="plazasPrimera" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Precio Turista ($) *</label>
+                                <input type="number" class="form-control" th:field="*{precio}" step="0.01" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Precio Primera ($) *</label>
+                                <input type="number" class="form-control" name="precioPrimera" step="0.01" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Duración (minutos)</label>
+                                <input type="number" class="form-control" name="duracionMinutos">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Estado</label>
+                                <select class="form-select" name="estado">
+                                    <option value="PROGRAMADO" selected>Programado</option>
+                                    <option value="EN_VUELO">En Vuelo</option>
+                                    <option value="CANCELADO">Cancelado</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary">Guardar Vuelo</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

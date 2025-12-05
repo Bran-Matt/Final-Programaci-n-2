@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${titulo}">Dueño - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container mt-4">
+        <!-- Header del Dashboard -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h1><i class="fas fa-crown text-warning me-2"></i>Dashboard - Dueño</h1>
+                    <div class="text-muted">
+                        <i class="fas fa-user me-1"></i>
+                        <span th:text="${usuario.nombre} + ' ' + ${usuario.apellido}"></span>
+                    </div>
+                </div>
+                <p class="lead">Bienvenido al panel de control principal. Desde aquí puede gestionar toda la cadena de agencias.</p>
+            </div>
+        </div>
+
+        <!-- Tarjetas de Resumen -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card text-white bg-primary">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 th:text="${#lists.size(usuarios)}">0</h4>
+                                <p>Usuarios Totales</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-users fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-success">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 th:text="${#lists.size(sucursales)}">0</h4>
+                                <p>Sucursales</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-store fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-warning">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 th:text="${#lists.size(vuelos)}">0</h4>
+                                <p>Vuelos Activos</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-plane fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-white bg-info">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <h4 th:text="${#lists.size(hoteles)}">0</h4>
+                                <p>Hoteles</p>
+                            </div>
+                            <div class="align-self-center">
+                                <i class="fas fa-hotel fa-2x"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Menú Principal del Dueño -->
+        <div class="row">
+            <!-- Gestión de Sucursales -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-store me-2"></i>Gestión de Sucursales
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Administre las sucursales de la cadena de agencias.</p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-list text-primary me-2"></i>
+                                <a th:href="@{/duenio/sucursales}" class="text-decoration-none">
+                                    Ver listado de sucursales
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-plus-circle text-success me-2"></i>
+                                <a th:href="@{/duenio/sucursales}" class="text-decoration-none">
+                                    Agregar nueva sucursal
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gestión de Vuelos -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-plane me-2"></i>Gestión de Vuelos
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Administre los vuelos regulares contratados.</p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-list text-primary me-2"></i>
+                                <a th:href="@{/duenio/vuelos}" class="text-decoration-none">
+                                    Ver listado de vuelos
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-plus-circle text-success me-2"></i>
+                                <a th:href="@{/duenio/vuelos}" class="text-decoration-none">
+                                    Agregar nuevo vuelo
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gestión de Hoteles -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0">
+                            <i class="fas fa-hotel me-2"></i>Gestión de Hoteles
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Administre los hoteles contratados de forma exclusiva.</p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-list text-primary me-2"></i>
+                                <a th:href="@{/duenio/hoteles}" class="text-decoration-none">
+                                    Ver listado de hoteles
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-plus-circle text-success me-2"></i>
+                                <a th:href="@{/duenio/hoteles}" class="text-decoration-none">
+                                    Agregar nuevo hotel
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Gestión de Personal -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users-cog me-2"></i>Gestión de Personal
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Administre el personal de la cadena de agencias.</p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-crown text-warning me-2"></i>
+                                <a th:href="@{/duenio/administradores}" class="text-decoration-none">
+                                    Administradores
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-chart-line text-success me-2"></i>
+                                <a th:href="@{/duenio/vendedores}" class="text-decoration-none">
+                                    Vendedores (por facturación)
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-user-plus text-primary me-2"></i>
+                                <a th:href="@{/duenio/administradores/nuevo}" class="text-decoration-none">
+                                    Agregar administrador
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reportes y Estadísticas -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-chart-bar me-2"></i>Reportes y Estadísticas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Consulte reportes y estadísticas del negocio.</p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-money-bill-wave text-success me-2"></i>
+                                <a th:href="@{/duenio/vendedores}" class="text-decoration-none">
+                                    Facturación por vendedor
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-chart-pie text-info me-2"></i>
+                                <a href="#" class="text-decoration-none">
+                                    Estadísticas de ventas (Próximamente)
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuración del Sistema -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-cogs me-2"></i>Configuración del Sistema
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text">Configuraciones generales del sistema.</p>
+                        <ul class="list-unstyled">
+                            <li class="mb-2">
+                                <i class="fas fa-user-shield text-warning me-2"></i>
+                                <a href="#" class="text-decoration-none">
+                                    Configuración de seguridad
+                                </a>
+                            </li>
+                            <li class="mb-2">
+                                <i class="fas fa-database text-primary me-2"></i>
+                                <a href="#" class="text-decoration-none">
+                                    Backup de datos
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

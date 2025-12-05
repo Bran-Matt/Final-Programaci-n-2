@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Dueño - Vendedores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="position-sticky pt-3">
+                    <div class="sidebar-header">
+                        <h4><i class="fas fa-crown me-2"></i>Dueño</h4>
+                    </div>
+                    <ul class="sidebar-menu">
+                        <li><a th:href="@{/duenio/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a th:href="@{/duenio/sucursales}"><i class="fas fa-store"></i> Sucursales</a></li>
+                        <li><a th:href="@{/duenio/vuelos}"><i class="fas fa-plane"></i> Vuelos</a></li>
+                        <li><a th:href="@{/duenio/hoteles}"><i class="fas fa-hotel"></i> Hoteles</a></li>
+                        <li class="active"><a th:href="@{/duenio/vendedores}"><i class="fas fa-users"></i> Vendedores</a></li>
+                        <li><a th:href="@{/duenio/administradores}"><i class="fas fa-user-shield"></i> Administradores</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between pt-3 pb-2 mb-3 border-bottom">
+                    <h1><i class="fas fa-users me-2"></i>Vendedores por Facturación</h1>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-primary">
+                            <i class="fas fa-sync-alt"></i> Actualizar
+                        </button>
+                        <button class="btn btn-outline-success" onclick="exportToCSV('tablaVendedores', 'vendedores_facturacion.csv')">
+                            <i class="fas fa-download"></i> Exportar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <h3 th:text="${totalVendedores}">2</h3>
+                                <p>Vendedores Activos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h3 th:text="'$' + ${facturacionTotal}">$4,300.50</h3>
+                                <p>Facturación Total</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <h3 th:text="'$' + ${facturacionPromedio}">$2,150.25</h3>
+                                <p>Promedio por Vendedor</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body text-center">
+                                <h3 th:text="'$' + ${comisionTotal}">$753.00</h3>
+                                <p>Comisión Total</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ranking Table -->
+                <div class="card">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-trophy me-2"></i> Ranking de Vendedores</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="tablaVendedores">
+                                <thead>
+                                    <tr>
+                                        <th width="50">#</th>
+                                        <th>Vendedor</th>
+                                        <th>Contacto</th>
+                                        <th>Clientes</th>
+                                        <th>Facturación</th>
+                                        <th>Comisión</th>
+                                        <th>Comisión %</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="vendedor, stat : ${vendedores}">
+                                        <td>
+                                            <div th:if="${stat.index == 0}" class="text-center">
+                                                <i class="fas fa-trophy fa-2x text-warning"></i>
+                                            </div>
+                                            <div th:if="${stat.index == 1}" class="text-center">
+                                                <i class="fas fa-medal fa-2x text-secondary"></i>
+                                            </div>
+                                            <div th:if="${stat.index == 2}" class="text-center">
+                                                <i class="fas fa-award fa-2x text-danger"></i>
+                                            </div>
+                                            <div th:if="${stat.index > 2}" class="text-center">
+                                                <span class="badge bg-dark" th:text="${stat.index + 1}">4</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar me-3">
+                                                    <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                                         style="width: 40px; height: 40px;">
+                                                        <span th:text="${vendedor.nombre.charAt(0)} + ${vendedor.apellido.charAt(0)}">MC</span>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <strong th:text="${vendedor.nombre} + ' ' + ${vendedor.apellido}">Marcos Cardenas</strong><br>
+                                                    <small class="text-muted" th:text="'Código: ' + ${vendedor.codigoUsuario}">Código: 9</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div th:text="${vendedor.email}">marcoscardenas@gmail.com</div>
+                                            <small class="text-muted" th:text="${vendedor.telefono}">011 3333 4411</small>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-info" th:text="${vendedor.totalClientes}">8</span>
+                                            <small class="text-muted d-block">clientes</small>
+                                        </td>
+                                        <td>
+                                            <div class="progress mb-1" style="height: 20px;">
+                                                <div class="progress-bar bg-success" 
+                                                     role="progressbar" 
+                                                     th:style="'width: ' + ${vendedor.porcentajeFacturacion} + '%;'"
+                                                     th:attr="aria-valuenow=${vendedor.porcentajeFacturacion}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                            <strong th:text="'$' + ${#numbers.formatDecimal(vendedor.facturacion, 0, 2)}">$2,500.00</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-warning" 
+                                                  th:text="'$' + ${#numbers.formatDecimal(vendedor.facturacion * (vendedor.comisionPorcentaje/100), 0, 2)}">
+                                                $375.00
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary" 
+                                                  th:text="${vendedor.comisionPorcentaje} + '%'">15%</span>
+                                        </td>
+                                        <td>
+                                            <span th:if="${vendedor.estado == 'ACTIVO'}" 
+                                                  class="badge bg-success">Activo</span>
+                                            <span th:if="${vendedor.estado == 'INACTIVO'}" 
+                                                  class="badge bg-danger">Inactivo</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <button class="btn btn-outline-info" title="Ver detalles">
+                                                    <i class="fas fa-chart-line"></i>
+                                                </button>
+                                                <button class="btn btn-outline-warning" title="Ajustar comisión">
+                                                    <i class="fas fa-percentage"></i>
+                                                </button>
+                                                <button class="btn btn-outline-primary" title="Enviar mensaje">
+                                                    <i class="fas fa-envelope"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-chart-pie"></i> Distribución de Facturación</h5>
+                            </div>
+                            <div class="card-body">
+                                <div style="height: 300px; background: #f8f9fa; border-radius: 5px; padding: 20px;">
+                                    <div class="text-center text-muted">
+                                        <i class="fas fa-chart-pie fa-3x mb-3"></i>
+                                        <p>Gráfico de distribución</p>
+                                        <small>(Implementar con Chart.js)</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Facturación Mensual</h5>
+                            </div>
+                            <div class="card-body">
+                                <div style="height: 300px; background: #f8f9fa; border-radius: 5px; padding: 20px;">
+                                    <div class="text-center text-muted">
+                                        <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                                        <p>Gráfico de barras</p>
+                                        <small>(Implementar con Chart.js)</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

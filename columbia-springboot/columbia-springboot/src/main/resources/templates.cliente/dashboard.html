@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cliente - Mi Información</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+    
+    <div class="container mt-4">
+        <!-- Welcome Card -->
+        <div class="card bg-gradient-primary text-white mb-4">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h2><i class="fas fa-hand-wave"></i> ¡Hola, <span th:text="${cliente.nombre}">Lautaro</span>!</h2>
+                        <p>Bienvenido a tu panel de cliente. Aquí puedes ver toda la información de tu viaje.</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <div class="badge bg-light text-dark p-2">
+                            <i class="fas fa-user-tag"></i> Cliente
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Personal Info -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-user-circle text-primary"></i> Mis Datos</h5>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">Nombre:</dt>
+                            <dd class="col-sm-8" th:text="${cliente.nombre} + ' ' + ${cliente.apellido}">Lautaro Gonzalez</dd>
+                            
+                            <dt class="col-sm-4">Código:</dt>
+                            <dd class="col-sm-8" th:text="${cliente.codigoUsuario}">15</dd>
+                            
+                            <dt class="col-sm-4">Email:</dt>
+                            <dd class="col-sm-8" th:text="${cliente.email}">uriherman@hotmail.com</dd>
+                            
+                            <dt class="col-sm-4">Teléfono:</dt>
+                            <dd class="col-sm-8" th:text="${cliente.telefono}">011 2376 5364</dd>
+                            
+                            <dt class="col-sm-4">Dirección:</dt>
+                            <dd class="col-sm-8" th:text="${cliente.direccion}">Dr. Guillermo Geabeler 2097</dd>
+                        </dl>
+                        <button class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-edit"></i> Editar mis datos
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sucursal Info -->
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0"><i class="fas fa-store text-success"></i> Mi Sucursal</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${cliente.sucursalAsignada}">
+                            <h6 th:text="${cliente.sucursalAsignada.codigo} + ' - Columbia Viajes'">103 - Columbia Viajes</h6>
+                            <p class="mb-1">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span th:text="${cliente.sucursalAsignada.direccion}">Marcelo T. de Alvear 500</span>
+                            </p>
+                            <p class="mb-1">
+                                <i class="fas fa-phone"></i>
+                                <span th:text="${cliente.sucursalAsignada.telefono}">011 4319 7123</span>
+                            </p>
+                            <p class="mb-1">
+                                <i class="fas fa-envelope"></i>
+                                <span th:text="${cliente.sucursalAsignada.email}">sucursalalvear@gmail.com</span>
+                            </p>
+                        </div>
+                        <div th:unless="${cliente.sucursalAsignada}" class="text-center py-4">
+                            <i class="fas fa-store-slash fa-2x text-muted mb-3"></i>
+                            <p class="text-muted">No tienes sucursal asignada</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Travel Info -->
+        <div class="row mb-4">
+            <!-- Flight Info -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-plane text-info"></i> Mi Vuelo</h5>
+                        <span class="badge bg-info" th:if="${cliente.vueloAsignado}">
+                            <i class="fas fa-check"></i> Confirmado
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${cliente.vueloAsignado}">
+                            <div class="text-center mb-3">
+                                <h3 th:text="${cliente.vueloAsignado.numeroVuelo}" class="display-6">CV-001</h3>
+                                <small class="text-muted">Número de Vuelo</small>
+                            </div>
+                            
+                            <div class="row text-center mb-3">
+                                <div class="col">
+                                    <h5 th:text="${cliente.vueloAsignado.origen}">Montevideo</h5>
+                                    <small class="text-muted">Origen</small>
+                                </div>
+                                <div class="col">
+                                    <i class="fas fa-long-arrow-alt-right fa-2x text-muted"></i>
+                                </div>
+                                <div class="col">
+                                    <h5 th:text="${cliente.vueloAsignado.destino}">Paris</h5>
+                                    <small class="text-muted">Destino</small>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Fecha:</strong> <span th:text="${cliente.vueloAsignado.fecha}">04/01/2024</span></p>
+                                    <p class="mb-1"><strong>Plazas Totales:</strong> <span th:text="${cliente.vueloAsignado.plazasTotales}">150</span></p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Precio:</strong> 
+                                        <span class="badge bg-success" th:text="'$' + ${cliente.vueloAsignado.precio}">$800.00</span>
+                                    </p>
+                                    <p class="mb-1"><strong>Clase:</strong> 
+                                        <span class="badge bg-info">Turista</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:unless="${cliente.vueloAsignado}" class="text-center py-4">
+                            <i class="fas fa-plane-slash fa-2x text-muted mb-3"></i>
+                            <p class="text-muted">No tienes vuelo asignado</p>
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-search"></i> Buscar vuelos
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hotel Info -->
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="fas fa-hotel text-warning"></i> Mi Hotel</h5>
+                        <span class="badge bg-warning" th:if="${cliente.hotelAsignado}">
+                            <i class="fas fa-check"></i> Reservado
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${cliente.hotelAsignado}">
+                            <h4 th:text="${cliente.hotelAsignado.nombre}" class="text-center mb-3">La Estrella de Montevideo</h4>
+                            
+                            <div class="text-center mb-3">
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <i class="fas fa-star text-warning"></i>
+                                <span class="text-muted ms-2">4 Estrellas</span>
+                            </div>
+                            
+                            <p class="mb-2">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span th:text="${cliente.hotelAsignado.ciudad} + ', ' + ${cliente.hotelAsignado.direccion}">
+                                    Montevideo, Canelones 2322
+                                </span>
+                            </p>
+                            
+                            <p class="mb-2">
+                                <i class="fas fa-phone"></i>
+                                <span th:text="${cliente.hotelAsignado.telefono}">92 114 327</span>
+                            </p>
+                            
+                            <hr>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Plazas Disponibles:</strong> 
+                                        <span th:text="${cliente.hotelAsignado.plazasDisponibles}">50</span>
+                                    </p>
+                                </div>
+                                <div class="col-md-6">
+                                    <p class="mb-1"><strong>Precio/Noche:</strong> 
+                                        <span class="badge bg-success" th:text="'$' + ${cliente.hotelAsignado.precio}">$120.00</span>
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <p class="mb-1"><strong>Servicios Incluidos:</strong></p>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-light text-dark">WiFi</span>
+                                    <span class="badge bg-light text-dark">Desayuno</span>
+                                    <span class="badge bg-light text-dark">Piscina</span>
+                                    <span class="badge bg-light text-dark">Gimnasio</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:unless="${cliente.hotelAsignado}" class="text-center py-4">
+                            <i class="fas fa-bed fa-2x text-muted mb-3"></i>
+                            <p class="text-muted">No tienes hotel asignado</p>
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-search"></i> Buscar hoteles
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Travel Summary -->
+        <div class="card mb-4">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-file-invoice-dollar text-success"></i> Resumen del Viaje</h5>
+            </div>
+            <div class="card-body">
+                <div th:if="${cliente.vueloAsignado && cliente.hotelAsignado}" class="row">
+                    <div class="col-md-8">
+                        <h6>Detalles de Costos</h6>
+                        <table class="table table-sm">
+                            <tbody>
+                                <tr>
+                                    <td>Vuelo:</td>
+                                    <td class="text-end" th:text="'$' + ${cliente.vueloAsignado.precio}">$800.00</td>
+                                </tr>
+                                <tr>
+                                    <td>Hotel (3 noches):</td>
+                                    <td class="text-end" th:text="'$' + (${cliente.hotelAsignado.precio} * 3)">$360.00</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Total:</strong></td>
+                                    <td class="text-end">
+                                        <strong th:text="'$' + (${cliente.vueloAsignado.precio} + (${cliente.hotelAsignado.precio} * 3))">
+                                            $1,160.00
+                                        </strong>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="mb-3">
+                                <i class="fas fa-qrcode fa-3x text-muted"></i>
+                            </div>
+                            <button class="btn btn-success w-100 mb-2">
+                                <i class="fas fa-download"></i> Descargar Itinerario
+                            </button>
+                            <button class="btn btn-outline-primary w-100">
+                                <i class="fas fa-print"></i> Imprimir
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div th:unless="${cliente.vueloAsignado && cliente.hotelAsignado}" class="text-center py-4">
+                    <i class="fas fa-shopping-cart fa-2x text-muted mb-3"></i>
+                    <p class="text-muted">Tu viaje está incompleto</p>
+                    <p class="text-muted small">Contacta con tu vendedor para completar la reserva</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Support -->
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0"><i class="fas fa-headset text-info"></i> Soporte y Ayuda</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="p-3 border rounded">
+                            <i class="fas fa-question-circle fa-2x text-primary mb-2"></i>
+                            <h6>Preguntas Frecuentes</h6>
+                            <p class="small text-muted">Encuentra respuestas rápidas</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="p-3 border rounded">
+                            <i class="fas fa-phone-alt fa-2x text-success mb-2"></i>
+                            <h6>Contactar Sucursal</h6>
+                            <p class="small text-muted" th:if="${cliente.sucursalAsignada}" 
+                               th:text="${cliente.sucursalAsignada.telefono}">011 4319 7123</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4 text-center mb-3">
+                        <div class="p-3 border rounded">
+                            <i class="fas fa-comment-dots fa-2x text-warning mb-2"></i>
+                            <h6>Soporte en Línea</h6>
+                            <p class="small text-muted">Chat disponible 24/7</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Administrador - Vendedores</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse no-print">
+                <div class="position-sticky pt-3">
+                    <div class="sidebar-header">
+                        <h4><i class="fas fa-user-shield me-2"></i>Administrador</h4>
+                    </div>
+                    <ul class="sidebar-menu">
+                        <li>
+                            <a th:href="@{/admin/dashboard}">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
+                        </li>
+                        <li class="active">
+                            <a th:href="@{/admin/vendedores}">
+                                <i class="fas fa-users"></i> Vendedores
+                            </a>
+                        </li>
+                        <li>
+                            <a th:href="@{/admin/vendedores/nuevo}">
+                                <i class="fas fa-user-plus"></i> Nuevo Vendedor
+                            </a>
+                        </li>
+                        <li>
+                            <a th:href="@{/admin/clientes}">
+                                <i class="fas fa-user-friends"></i> Clientes
+                            </a>
+                        </li>
+                        <hr class="my-2">
+                        <li>
+                            <a th:href="@{/auth/logout}" class="text-danger">
+                                <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <!-- Page Header -->
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">
+                        <i class="fas fa-users me-2 text-primary"></i>Gestión de Vendedores
+                    </h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <a th:href="@{/admin/vendedores/nuevo}" class="btn btn-primary me-2">
+                            <i class="fas fa-user-plus me-1"></i>Nuevo Vendedor
+                        </a>
+                        <button class="btn btn-outline-secondary" onclick="printElement('vendedores-table')">
+                            <i class="fas fa-print me-1"></i>Imprimir
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search and Filters -->
+                <div class="card shadow mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-search"></i>
+                                    </span>
+                                    <input type="text" class="form-control" 
+                                           placeholder="Buscar vendedor..." 
+                                           data-table="vendedores-table">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="fas fa-filter"></i>
+                                    </span>
+                                    <select class="form-select">
+                                        <option>Todos los estados</option>
+                                        <option>Activos</option>
+                                        <option>Inactivos</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vendedores Table -->
+                <div class="card shadow" id="vendedores-table">
+                    <div class="card-header bg-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list me-2"></i>Listado de Vendedores
+                            <span class="badge bg-primary ms-2" th:text="${#lists.size(vendedores)}">2</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Nombre</th>
+                                        <th>Código</th>
+                                        <th>Email</th>
+                                        <th>Teléfono</th>
+                                        <th>Facturación</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="vendedor : ${vendedores}">
+                                        <td th:text="${vendedor.id}">1</td>
+                                        <td>
+                                            <strong th:text="${vendedor.nombre} + ' ' + ${vendedor.apellido}">
+                                                Marcos Cardenas
+                                            </strong>
+                                        </td>
+                                        <td th:text="${vendedor.codigoUsuario}">9</td>
+                                        <td th:text="${vendedor.email}">marcoscardenas@gmail.com</td>
+                                        <td th:text="${vendedor.telefono}">011 3333 4411</td>
+                                        <td>
+                                            <span class="badge bg-success" 
+                                                  th:text="'$' + ${#numbers.formatDecimal(vendedor.facturacion, 0, 2)}">
+                                                $2,500.00
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">Activo</span>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <button class="btn btn-outline-info" 
+                                                        title="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button class="btn btn-outline-warning" 
+                                                        title="Editar">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-outline-danger btn-delete" 
+                                                        title="Eliminar">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- Empty State -->
+                        <div th:if="${#lists.isEmpty(vendedores)}" class="text-center py-5">
+                            <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                            <h4>No hay vendedores registrados</h4>
+                            <p class="text-muted">Comience agregando un nuevo vendedor</p>
+                            <a th:href="@{/admin/vendedores/nuevo}" class="btn btn-primary">
+                                <i class="fas fa-user-plus me-1"></i>Agregar Primer Vendedor
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <!-- Table Footer -->
+                    <div class="card-footer bg-white">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <small class="text-muted">
+                                    Mostrando <span th:text="${#lists.size(vendedores)}">2</span> vendedores
+                                </small>
+                            </div>
+                            <div class="col-md-6 text-end">
+                                <button class="btn btn-sm btn-outline-primary" onclick="exportToCSV('vendedores-table', 'vendedores.csv')">
+                                    <i class="fas fa-download me-1"></i>Exportar CSV
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <div th:replace="fragments/footer :: footer"></div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>

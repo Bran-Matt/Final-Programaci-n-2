@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Vendedor - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <div th:replace="fragments/header :: header"></div>
+    
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar Vendedor -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar">
+                <div class="position-sticky pt-3">
+                    <div class="sidebar-header">
+                        <h4><i class="fas fa-user-tie me-2"></i>Vendedor</h4>
+                        <small th:text="${usuario.nombre} + ' ' + ${usuario.apellido}">Marcos Cardenas</small>
+                    </div>
+                    <ul class="sidebar-menu">
+                        <li class="active"><a th:href="@{/vendedor/dashboard}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                        <li><a th:href="@{/vendedor/clientes}"><i class="fas fa-user-friends"></i> Mis Clientes</a></li>
+                        <li><a th:href="@{/vendedor/clientes/nuevo}"><i class="fas fa-user-plus"></i> Nuevo Cliente</a></li>
+                        <li><a href="#"><i class="fas fa-chart-line"></i> Mis Ventas</a></li>
+                        <li><a href="#"><i class="fas fa-money-bill-wave"></i> Comisiones</a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <!-- Welcome Card -->
+                <div class="card bg-primary text-white mb-4">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h3><i class="fas fa-hand-wave"></i> ¡Bienvenido, <span th:text="${usuario.nombre}">Marcos</span>!</h3>
+                                <p>Aquí puedes gestionar tus clientes y ver tus estadísticas de ventas.</p>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <h2 th:text="'$' + ${#numbers.formatDecimal(usuario.facturacion, 0, 2)}">$2,500.00</h2>
+                                <p>Facturación Total</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h3 th:text="${totalClientes}">12</h3>
+                                <p><i class="fas fa-user-friends"></i> Clientes</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <h3 th:text="${ventasMes}">8</h3>
+                                <p><i class="fas fa-shopping-cart"></i> Ventas Mes</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-warning text-white">
+                            <div class="card-body text-center">
+                                <h3 th:text="'$' + ${comisionMes}">$375.00</h3>
+                                <p><i class="fas fa-money-bill-wave"></i> Comisión</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card bg-danger text-white">
+                            <div class="card-body text-center">
+                                <h3 th:text="${pendientes}">3</h3>
+                                <p><i class="fas fa-clock"></i> Pendientes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-bolt"></i> Acciones Rápidas</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4 mb-3">
+                                        <a th:href="@{/vendedor/clientes/nuevo}" class="btn btn-primary w-100">
+                                            <i class="fas fa-user-plus"></i> Nuevo Cliente
+                                        </a>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <a th:href="@{/vendedor/clientes}" class="btn btn-success w-100">
+                                            <i class="fas fa-search"></i> Buscar Cliente
+                                        </a>
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <a href="#" class="btn btn-warning w-100">
+                                            <i class="fas fa-file-invoice-dollar"></i> Nueva Venta
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Clients -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-history"></i> Clientes Recientes</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="list-group">
+                                    <a href="#" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">Lautaro Gonzalez</h6>
+                                            <small>Hace 2 días</small>
+                                        </div>
+                                        <p class="mb-1">Montevideo - Paris</p>
+                                        <small><i class="fas fa-hotel"></i> La Estrella</small>
+                                    </a>
+                                    <a href="#" class="list-group-item list-group-item-action">
+                                        <div class="d-flex w-100 justify-content-between">
+                                            <h6 class="mb-1">Uriel Herman</h6>
+                                            <small>Hace 1 semana</small>
+                                        </div>
+                                        <p class="mb-1">Turin - Seul</p>
+                                        <small><i class="fas fa-hotel"></i> VELT hotel</small>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sales Chart -->
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="mb-0"><i class="fas fa-chart-line"></i> Ventas Últimos 7 Días</h5>
+                            </div>
+                            <div class="card-body">
+                                <!-- Simple chart placeholder -->
+                                <div style="height: 200px; background: #f8f9fa; border-radius: 5px; padding: 20px;">
+                                    <div class="text-center text-muted">
+                                        <i class="fas fa-chart-bar fa-3x mb-3"></i>
+                                        <p>Gráfico de ventas</p>
+                                        <small>(Implementar con Chart.js)</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>
