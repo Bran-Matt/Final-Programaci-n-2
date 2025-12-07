@@ -1,0 +1,456 @@
+-- =============================================
+-- Base de Datos: Columbia Viajes
+-- Sistema de Gestión de Agencias de Viajes
+-- =============================================
+
+-- Crear la base de datos
+CREATE DATABASE IF NOT EXISTS `columbia_viajes` 
+DEFAULT CHARACTER SET utf8mb4 
+COLLATE utf8mb4_unicode_ci;
+
+USE `columbia_viajes`;
+
+-- =============================================
+-- TABLA: usuarios (Tabla base para herencia)
+-- =============================================
+CREATE TABLE `usuarios` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(100) NOT NULL,
+  `apellido` VARCHAR(100) NOT NULL,
+  `codigo_usuario` VARCHAR(50) NOT NULL UNIQUE,
+  `clave` VARCHAR(100) NOT NULL,
+  `rol` VARCHAR(20) NOT NULL,
+  `direccion` VARCHAR(200),
+  `email` VARCHAR(100),
+  `telefono` VARCHAR(20),
+  `fecha_creacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `fecha_actualizacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX `idx_codigo_usuario` (`codigo_usuario`),
+  INDEX `idx_rol` (`rol`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================
+-- TABLA: duenios (Herencia de usuarios)
+-- =============================================
+CREATE TABLE `duenios` (
+  `usuario_id` BIGINT NOT NULL,
+  `fecha_ingreso` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`usuario_id`),
+  CONSTRAINT `fk_duenio_usuario` 
+    FOREIGN KEY (`usuario_id`) 
+    REFERENCES `usuarios` (`id`) 
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================
+-- TABLA: administradores (Herencia de usuarios)
+-- =============================================
+CREATE TABLE `administradores` (
+  `usuario_id` BIGINT NOT NULL,
+  `departamento` VARCHAR(50),
+  `fecha_contratacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`usuario_id`),
+  CONSTRAINT `fk_administrador_usuario` 
+    FOREIGN KEY (`usuario_id`) 
+    REFERENCES `usuarios` (`id`) 
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================
+-- TABLA: vendedores (Herencia de usuarios)
+-- =============================================
+CREATE TABLE `vendedores` (
+  `usuario_id` BIGINT NOT NULL,
+  `facturacion` DECIMAL(10,2) DEFAULT 0.00,
+  `comision_porcentaje` DECIMAL(5,2) DEFAULT 10.00,
+  `fecha_contratacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `estado` ENUM('ACTIVO', 'INACTIVO') DEFAULT 'ACTIVO',
+  PRIMARY KEY (`usuario_id`),
+  INDEX `idx_facturacion` (`facturacion`),
+  CONSTRAINT `fk_vendedor_usuario` 
+    FOREIGN KEY (`usuario_id`) 
+    REFERENCES `usuarios` (`id`) 
+    ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================
+-- TABLA: sucursales
+-- =============================================
+CREATE TABLE `sucursales` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `codigo` VARCHAR(10) NOT NULL UNIQUE,
+  `direccion` VARCHAR(200) NOT NULL,
+  `email` VARCHAR(100),
+  `telefono` VARCHAR(20),
+  `ciudad` VARCHAR(100),
+  `provincia` VARCHAR(100),
+  `fecha_apertura` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `estado` ENUM('ACTIVA', 'INACTIVA') DEFAULT 'ACTIVA',
+  PRIMARY KEY (`id`),
+  INDEX `idx_codigo` (`codigo`),
+  INDEX `idx_ciudad` (`ciudad`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================
+-- TABLA: hoteles
+-- =============================================
+CREATE TABLE `hoteles` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `nombre` VARCHAR(100) NOT NULL UNIQUE,
+  `direccion` VARCHAR(200) NOT NULL,
+  `ciudad` VARCHAR(100) NOT NULL,
+  `pais` VARCHAR(100) DEFAULT 'Argentina',
+  `telefono` VARCHAR(20),
+  `plazas_disponibles` INT NOT NULL,
+  `precio_noche` DECIMAL(10,2) NOT NULL,
+  `categoria` ENUM('1_ESTRELLA', '2_ESTRELLAS', '3_ESTRELLAS', '4_ESTRELLAS', '5_ESTRELLAS') DEFAULT '3_ESTRELLAS',
+  `servicios` TEXT,
+  `estado` ENUM('DISPONIBLE', 'NO_DISPONIBLE') DEFAULT 'DISPONIBLE',
+  `fecha_registro` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX `idx_nombre` (`nombre`),
+  INDEX `idx_ciudad` (`ciudad`),
+  INDEX `idx_categoria` (`categoria`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================
+-- TABLA: vuelos
+-- =============================================
+CREATE TABLE `vuelos` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `numero_vuelo` INT NOT NULL UNIQUE,
+  `fecha_salida` DATETIME NOT NULL,
+  `fecha_llegada` DATETIME NOT NULL,
+  `origen` VARCHAR(100) NOT NULL,
+  `destino` VARCHAR(100) NOT NULL,
+  `aerolinea` VARCHAR(100) DEFAULT 'Columbia Airlines',
+  `plazas_totales` INT NOT NULL,
+  `plazas_turista` INT NOT NULL,
+  `plazas_primera` INT NOT NULL,
+  `precio_turista` DECIMAL(10,2) NOT NULL,
+  `precio_primera` DECIMAL(10,2) NOT NULL,
+  `duracion_minutos` INT,
+  `estado` ENUM('PROGRAMADO', 'EN_VUELO', 'ATERRIZADO', 'CANCELADO') DEFAULT 'PROGRAMADO',
+  `fecha_registro` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  INDEX `idx_numero_vuelo` (`numero_vuelo`),
+  INDEX `idx_fecha_salida` (`fecha_salida`),
+  INDEX `idx_origen_destino` (`origen`, `destino`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================
+-- TABLA: clientes (Herencia de usuarios)
+-- =============================================
+CREATE TABLE `clientes` (
+  `usuario_id` BIGINT NOT NULL,
+  `sucursal_id` BIGINT,
+  `hotel_id` BIGINT,
+  `vuelo_id` BIGINT,
+  `fecha_registro` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `tipo_cliente` ENUM('OCASIONAL', 'FRECUENTE', 'VIP') DEFAULT 'OCASIONAL',
+  `preferencias` TEXT,
+  `observaciones` TEXT,
+  PRIMARY KEY (`usuario_id`),
+  CONSTRAINT `fk_cliente_usuario` 
+    FOREIGN KEY (`usuario_id`) 
+    REFERENCES `usuarios` (`id`) 
+    ON DELETE CASCADE,
+  CONSTRAINT `fk_cliente_sucursal` 
+    FOREIGN KEY (`sucursal_id`) 
+    REFERENCES `sucursales` (`id`) 
+    ON DELETE SET NULL,
+  CONSTRAINT `fk_cliente_hotel` 
+    FOREIGN KEY (`hotel_id`) 
+    REFERENCES `hoteles` (`id`) 
+    ON DELETE SET NULL,
+  CONSTRAINT `fk_cliente_vuelo` 
+    FOREIGN KEY (`vuelo_id`) 
+    REFERENCES `vuelos` (`id`) 
+    ON DELETE SET NULL,
+  INDEX `idx_tipo_cliente` (`tipo_cliente`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================
+-- TABLA: reservas (Tabla adicional para gestionar reservas)
+-- =============================================
+CREATE TABLE `reservas` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `codigo_reserva` VARCHAR(20) NOT NULL UNIQUE,
+  `cliente_id` BIGINT NOT NULL,
+  `vuelo_id` BIGINT,
+  `hotel_id` BIGINT,
+  `sucursal_id` BIGINT NOT NULL,
+  `fecha_reserva` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `fecha_inicio` DATE,
+  `fecha_fin` DATE,
+  `cantidad_personas` INT DEFAULT 1,
+  `clase_vuelo` ENUM('TURISTA', 'PRIMERA') DEFAULT 'TURISTA',
+  `regimen_hotel` ENUM('SOLO_ALOJAMIENTO', 'DESAYUNO', 'MEDIA_PENSION', 'PENSION_COMPLETA') DEFAULT 'SOLO_ALOJAMIENTO',
+  `precio_total` DECIMAL(10,2) NOT NULL,
+  `estado` ENUM('PENDIENTE', 'CONFIRMADA', 'CANCELADA', 'COMPLETADA') DEFAULT 'PENDIENTE',
+  `observaciones` TEXT,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_reserva_cliente` 
+    FOREIGN KEY (`cliente_id`) 
+    REFERENCES `clientes` (`usuario_id`),
+  CONSTRAINT `fk_reserva_vuelo` 
+    FOREIGN KEY (`vuelo_id`) 
+    REFERENCES `vuelos` (`id`),
+  CONSTRAINT `fk_reserva_hotel` 
+    FOREIGN KEY (`hotel_id`) 
+    REFERENCES `hoteles` (`id`),
+  CONSTRAINT `fk_reserva_sucursal` 
+    FOREIGN KEY (`sucursal_id`) 
+    REFERENCES `sucursales` (`id`),
+  INDEX `idx_codigo_reserva` (`codigo_reserva`),
+  INDEX `idx_fecha_reserva` (`fecha_reserva`),
+  INDEX `idx_estado` (`estado`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================
+-- TABLA: facturaciones (Registro detallado de facturación)
+-- =============================================
+CREATE TABLE `facturaciones` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT,
+  `vendedor_id` BIGINT NOT NULL,
+  `reserva_id` BIGINT NOT NULL,
+  `monto` DECIMAL(10,2) NOT NULL,
+  `comision` DECIMAL(10,2) NOT NULL,
+  `fecha_facturacion` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `metodo_pago` ENUM('EFECTIVO', 'TARJETA', 'TRANSFERENCIA') DEFAULT 'EFECTIVO',
+  `estado_pago` ENUM('PENDIENTE', 'PAGADO', 'CANCELADO') DEFAULT 'PENDIENTE',
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_facturacion_vendedor` 
+    FOREIGN KEY (`vendedor_id`) 
+    REFERENCES `vendedores` (`usuario_id`),
+  CONSTRAINT `fk_facturacion_reserva` 
+    FOREIGN KEY (`reserva_id`) 
+    REFERENCES `reservas` (`id`),
+  INDEX `idx_fecha_facturacion` (`fecha_facturacion`),
+  INDEX `idx_vendedor_fecha` (`vendedor_id`, `fecha_facturacion`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- =============================================
+-- INSERCIÓN DE DATOS INICIALES
+-- =============================================
+
+-- Insertar usuarios base
+INSERT INTO `usuarios` (`nombre`, `apellido`, `codigo_usuario`, `clave`, `rol`, `direccion`, `email`, `telefono`) VALUES
+-- Dueño principal
+('Mateo Stefano', 'Branciforte', '1234', 'MATT', 'DUENIO', 'Avalos 958', 'mateo.branciforte@alu.inspt.utn.edu.ar', '63730305'),
+
+-- Administradores
+('Rodrigo', 'Escalante', '2', '21/02/1985', 'ADMINISTRADOR', 'Zarate 1400', 'roescalante@hotmail.com', '011 3256 2117'),
+('Tomas', 'Spazzinni', '3', '1123', 'ADMINISTRADOR', 'Franklin 850', 'tomispazzinni@gmail.com', '011 4578 1223'),
+
+-- Vendedores
+('Marcos', 'Cardenas', '9', '1099hola', 'VENDEDOR', 'Sin dirección', 'marcoscardenas@gmail.com', '011 3333 4411'),
+('Raul', 'Gracian', '11', 'basss35', 'VENDEDOR', 'Monte 3950', 'raulcontacto@hotmail.com', '011 0011 2352'),
+
+-- Clientes
+('Lautaro', 'Gonzalez', '15', 'tutotu617', 'CLIENTE', 'Dr. Guillermo Geabeler 2097', 'uriherman@hotmail.com', '011 2376 5364'),
+('Uriel', 'Herman', '16', '13/12/2009', 'CLIENTE', 'Callao 1100', 'uriHerman@hotmail.com', '011 5252 6677');
+
+-- Insertar dueños
+INSERT INTO `duenios` (`usuario_id`) VALUES (1);
+
+-- Insertar administradores
+INSERT INTO `administradores` (`usuario_id`, `departamento`) VALUES 
+(2, 'Gerencia'),
+(3, 'Sistemas');
+
+-- Insertar vendedores
+INSERT INTO `vendedores` (`usuario_id`, `facturacion`, `comision_porcentaje`) VALUES 
+(4, 2500.00, 15.00),
+(5, 1800.50, 12.50);
+
+-- Insertar sucursales
+INSERT INTO `sucursales` (`codigo`, `direccion`, `email`, `telefono`, `ciudad`, `provincia`) VALUES
+('103', 'Marcelo Torcuato de Alvear 500', 'sucursalalvear@gmail.com', '011 4319 7123', 'Buenos Aires', 'CABA'),
+('117', 'Av. Belgrano 3200', 'sucursalbelgrano@gmail.com', '011 8989 8111', 'Buenos Aires', 'CABA'),
+('201', 'Av. Corrientes 1234', 'sucursalcorrientes@columbiaviajes.com', '011 4567 8901', 'Buenos Aires', 'CABA');
+
+-- Insertar hoteles
+INSERT INTO `hoteles` (`nombre`, `direccion`, `ciudad`, `telefono`, `plazas_disponibles`, `precio_noche`, `categoria`, `servicios`) VALUES
+('La Estrella de Montevideo', 'Canelones 2322', 'Montevideo', '92 114 327', 50, 120.00, '4_ESTRELLAS', 'WiFi, Desayuno, Piscina, Gym'),
+('VELT hotel', '1-49 Hannam-dong', 'Seul', '83 2213 1357', 30, 200.00, '5_ESTRELLAS', 'WiFi, Spa, Restaurante, Business Center'),
+('Hotel Plaza', 'Av. Santa Fe 1234', 'Buenos Aires', '011 4789 1234', 40, 150.00, '4_ESTRELLAS', 'WiFi, Desayuno, Estacionamiento');
+
+-- Insertar vuelos
+INSERT INTO `vuelos` (`numero_vuelo`, `fecha_salida`, `fecha_llegada`, `origen`, `destino`, `plazas_totales`, `plazas_turista`, `plazas_primera`, `precio_turista`, `precio_primera`, `duracion_minutos`) VALUES
+(1, '2024-01-04 08:00:00', '2024-01-04 20:00:00', 'Montevideo, Uruguay', 'Paris, Francia', 150, 120, 30, 800.00, 1500.00, 720),
+(2, '2024-03-17 14:30:00', '2024-03-18 06:00:00', 'Turin, Italia', 'Seul, Corea del Sur', 200, 160, 40, 950.00, 1800.00, 990),
+(101, '2024-06-15 10:00:00', '2024-06-15 13:00:00', 'Buenos Aires', 'Mendoza', 100, 80, 20, 200.00, 400.00, 180);
+
+-- Insertar clientes con asignaciones
+INSERT INTO `clientes` (`usuario_id`, `sucursal_id`, `hotel_id`, `vuelo_id`, `tipo_cliente`) VALUES
+(6, 1, 1, 1, 'FRECUENTE'),
+(7, 2, 2, 2, 'OCASIONAL');
+
+-- Insertar algunas reservas de ejemplo
+INSERT INTO `reservas` (`codigo_reserva`, `cliente_id`, `vuelo_id`, `hotel_id`, `sucursal_id`, `fecha_inicio`, `fecha_fin`, `clase_vuelo`, `regimen_hotel`, `precio_total`, `estado`) VALUES
+('RES001', 6, 1, 1, 1, '2024-01-04', '2024-01-10', 'TURISTA', 'DESAYUNO', 1520.00, 'CONFIRMADA'),
+('RES002', 7, 2, 2, 2, '2024-03-17', '2024-03-24', 'PRIMERA', 'PENSION_COMPLETA', 4200.00, 'CONFIRMADA');
+
+-- Insertar facturaciones de ejemplo
+INSERT INTO `facturaciones` (`vendedor_id`, `reserva_id`, `monto`, `comision`, `metodo_pago`, `estado_pago`) VALUES
+(4, 1, 1520.00, 228.00, 'TARJETA', 'PAGADO'),
+(5, 2, 4200.00, 525.00, 'TRANSFERENCIA', 'PAGADO');
+
+-- =============================================
+-- VISTAS ÚTILES PARA CONSULTAS FRECUENTES
+-- =============================================
+
+-- Vista: Resumen de vendedores con facturación
+CREATE VIEW `vista_vendedores_facturacion` AS
+SELECT 
+    u.id,
+    u.nombre,
+    u.apellido,
+    u.codigo_usuario,
+    u.email,
+    u.telefono,
+    v.facturacion,
+    v.comision_porcentaje,
+    v.fecha_contratacion,
+    v.estado
+FROM `usuarios` u
+INNER JOIN `vendedores` v ON u.id = v.usuario_id
+ORDER BY v.facturacion DESC;
+
+-- Vista: Clientes con información completa
+CREATE VIEW `vista_clientes_completa` AS
+SELECT 
+    u.id,
+    u.nombre,
+    u.apellido,
+    u.codigo_usuario,
+    u.email,
+    u.telefono,
+    u.direccion,
+    c.tipo_cliente,
+    c.fecha_registro,
+    s.codigo as sucursal_codigo,
+    s.direccion as sucursal_direccion,
+    h.nombre as hotel_nombre,
+    h.ciudad as hotel_ciudad,
+    v.numero_vuelo,
+    v.origen as vuelo_origen,
+    v.destino as vuelo_destino
+FROM `usuarios` u
+INNER JOIN `clientes` c ON u.id = c.usuario_id
+LEFT JOIN `sucursales` s ON c.sucursal_id = s.id
+LEFT JOIN `hoteles` h ON c.hotel_id = h.id
+LEFT JOIN `vuelos` v ON c.vuelo_id = v.id;
+
+-- Vista: Reservas con información detallada
+CREATE VIEW `vista_reservas_detalladas` AS
+SELECT 
+    r.codigo_reserva,
+    CONCAT(u.nombre, ' ', u.apellido) as cliente_nombre,
+    u.codigo_usuario,
+    s.codigo as sucursal_codigo,
+    v.numero_vuelo,
+    CONCAT(v.origen, ' - ', v.destino) as ruta_vuelo,
+    h.nombre as hotel_nombre,
+    r.fecha_reserva,
+    r.fecha_inicio,
+    r.fecha_fin,
+    r.precio_total,
+    r.estado
+FROM `reservas` r
+INNER JOIN `clientes` c ON r.cliente_id = c.usuario_id
+INNER JOIN `usuarios` u ON c.usuario_id = u.id
+INNER JOIN `sucursales` s ON r.sucursal_id = s.id
+LEFT JOIN `vuelos` v ON r.vuelo_id = v.id
+LEFT JOIN `hoteles` h ON r.hotel_id = h.id;
+
+-- =============================================
+-- PROCEDIMIENTOS ALMACENADOS ÚTILES
+-- =============================================
+
+-- Procedimiento: Calcular facturación total por vendedor en un período
+DELIMITER //
+CREATE PROCEDURE `sp_calcular_facturacion_vendedor`(
+    IN p_vendedor_id BIGINT,
+    IN p_fecha_inicio DATE,
+    IN p_fecha_fin DATE,
+    OUT p_total_facturado DECIMAL(10,2)
+)
+BEGIN
+    SELECT COALESCE(SUM(f.monto), 0) INTO p_total_facturado
+    FROM `facturaciones` f
+    WHERE f.vendedor_id = p_vendedor_id
+    AND DATE(f.fecha_facturacion) BETWEEN p_fecha_inicio AND p_fecha_fin;
+END //
+DELIMITER ;
+
+-- Procedimiento: Obtener estadísticas de reservas por mes
+DELIMITER //
+CREATE PROCEDURE `sp_estadisticas_reservas_mes`(
+    IN p_anio INT,
+    IN p_mes INT
+)
+BEGIN
+    SELECT 
+        COUNT(*) as total_reservas,
+        SUM(precio_total) as facturacion_total,
+        AVG(precio_total) as promedio_venta,
+        estado,
+        COUNT(*) as cantidad_por_estado
+    FROM `reservas`
+    WHERE YEAR(fecha_reserva) = p_anio
+    AND MONTH(fecha_reserva) = p_mes
+    GROUP BY estado;
+END //
+DELIMITER ;
+
+-- =============================================
+-- TRIGGERS PARA MANTENER INTEGRIDAD
+-- =============================================
+
+-- Trigger: Actualizar facturación del vendedor cuando se inserta una facturación
+DELIMITER //
+CREATE TRIGGER `tr_actualizar_facturacion_vendedor`
+AFTER INSERT ON `facturaciones`
+FOR EACH ROW
+BEGIN
+    UPDATE `vendedores` 
+    SET `facturacion` = `facturacion` + NEW.monto
+    WHERE `usuario_id` = NEW.vendedor_id;
+END //
+DELIMITER ;
+
+-- Trigger: Actualizar plazas disponibles cuando se confirma una reserva con hotel
+DELIMITER //
+CREATE TRIGGER `tr_actualizar_plazas_hotel`
+AFTER UPDATE ON `reservas`
+FOR EACH ROW
+BEGIN
+    IF NEW.estado = 'CONFIRMADA' AND OLD.estado != 'CONFIRMADA' AND NEW.hotel_id IS NOT NULL THEN
+        UPDATE `hoteles` 
+        SET `plazas_disponibles` = `plazas_disponibles` - NEW.cantidad_personas
+        WHERE `id` = NEW.hotel_id;
+    END IF;
+END //
+DELIMITER ;
+
+-- =============================================
+-- CREACIÓN DE USUARIO PARA LA APLICACIÓN
+-- =============================================
+
+-- Crear usuario específico para la aplicación (opcional)
+CREATE USER IF NOT EXISTS 'columbia_app'@'localhost' IDENTIFIED BY 'ColumbiaApp2024!';
+GRANT SELECT, INSERT, UPDATE, DELETE ON `columbia_viajes`.* TO 'columbia_app'@'localhost';
+FLUSH PRIVILEGES;
+
+-- =============================================
+-- MENSAJE FINAL
+-- =============================================
+SELECT 'Base de datos Columbia Viajes creada exitosamente!' as Mensaje;
+SELECT 'Datos iniciales insertados:' as Resumen;
+SELECT COUNT(*) as Total_Usuarios FROM usuarios;
+SELECT COUNT(*) as Total_Sucursales FROM sucursales;
+SELECT COUNT(*) as Total_Hoteles FROM hoteles;
+SELECT COUNT(*) as Total_Vuelos FROM vuelos;
