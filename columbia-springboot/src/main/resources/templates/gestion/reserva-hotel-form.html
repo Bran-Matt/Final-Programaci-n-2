@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${titulo})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container" style="max-width: 900px">
+    <div class="cv-encabezado">
+        <div class="d-flex align-items-center gap-3">
+            <span class="cv-icono naranja"><i class="bi bi-building"></i></span>
+            <div><h1 th:text="${titulo}">Reserva de hotel</h1><p>Elegí el hotel, el régimen y las fechas de la estadía.</p></div>
+        </div>
+    </div>
+    <div th:replace="~{fragments/layout :: mensajes}"></div>
+    <form class="cv-card p-4" th:action="@{/gestion/reservas/hotel}" th:object="${form}" method="post" oninput="calcular()">
+        <input type="hidden" th:field="*{id}">
+        <div class="row g-3 mb-4">
+            <div th:class="${usuarioActual.puedeAdministrar()} ? 'col-md-6' : 'col-12'">
+                <label class="form-label" for="clienteId">Turista</label>
+                <select class="form-select" th:field="*{clienteId}" required>
+                    <option value="">Elegí un cliente...</option>
+                    <option th:each="c : ${clientes}" th:value="${c.id}" th:text="${c.nombreCompleto} + ' (' + ${c.codigo} + ')'"></option>
+                </select>
+                <small class="text-suave">¿No está? <a th:href="@{/gestion/clientes/nuevo}">Dar de alta un cliente</a></small>
+            </div>
+            <div class="col-md-6" th:if="${usuarioActual.puedeAdministrar()}">
+                <label class="form-label" for="vendedorId">Vendedor que factura</label>
+                <select class="form-select" th:field="*{vendedorId}">
+                    <option value="">Sin vendedor</option>
+                    <option th:each="v : ${vendedores}" th:value="${v.id}" th:text="${v.nombreCompleto}"></option>
+                </select>
+            </div>
+        </div>
+        <label class="form-label">Hotel</label>
+        <div class="row g-2 mb-4">
+            <div class="col-md-6" th:each="h : ${hoteles}">
+                <input type="radio" class="btn-check" th:field="*{hotelId}" th:value="${h.id}" th:id="'hotel-' + ${h.id}"
+                       th:attr="data-precio=${h.precioNoche}">
+                <label class="cv-opcion" th:for="'hotel-' + ${h.id}">
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-bold" th:text="${h.nombre}"></span>
+                        <span class="fw-semibold" th:text="'$ ' + ${#numbers.formatDecimal(h.precioNoche, 1, 'POINT', 0, 'COMMA')}"></span>
+                    </div>
+                    <small class="text-suave"><i class="bi bi-geo-alt me-1"></i><span th:text="${h.ciudad}"></span> · <span th:text="${h.plazasDisponibles}"></span> plazas</small>
+                </label>
+            </div>
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label class="form-label" for="fechaLlegada">Fecha de llegada</label>
+                <input type="date" class="form-control" th:field="*{fechaLlegada}" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label" for="fechaPartida">Fecha de partida</label>
+                <input type="date" class="form-control" th:field="*{fechaPartida}" required>
+            </div>
+        </div>
+        <label class="form-label">Régimen de hospedaje</label>
+        <div class="row g-2">
+            <div class="col-6" th:each="r : ${regimenes}">
+                <input type="radio" class="btn-check" th:field="*{regimen}" th:value="${r}" th:id="'regimen-' + ${r}"
+                       th:attr="data-factor=${r.factorPrecio}">
+                <label class="cv-opcion text-center" th:for="'regimen-' + ${r}">
+                    <i class="bi fs-4 d-block mb-1" th:classappend="${r.name() == 'MEDIA_PENSION'} ? 'bi-cup-hot' : 'bi-egg-fried'"></i>
+                    <span class="fw-semibold" th:text="${r.etiqueta}"></span>
+                    <small class="d-block text-suave" th:text="${r.name() == 'MEDIA_PENSION'} ? 'Desayuno y cena' : 'Todas las comidas (+35%)'"></small>
+                </label>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-4 pt-3 border-top">
+            <div><span class="text-suave">Importe estimado:</span> <span class="fs-4 fw-bold ms-1" id="total">$ 0</span></div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/gestion/reservas}" class="btn btn-light">Cancelar</a>
+                <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i>Guardar reserva</button>
+            </div>
+        </div>
+    </form>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script>
+    function calcular() {
+        var h = document.querySelector('input[name="hotelId"]:checked');
+        var r = document.querySelector('input[name="regimen"]:checked');
+        var ll = document.getElementById('fechaLlegada').value;
+        var pa = document.getElementById('fechaPartida').value;
+        var total = 0, noches = 0;
+        if (ll && pa) noches = Math.round((new Date(pa) - new Date(ll)) / 86400000);
+        if (h && r && noches > 0) total = noches * parseFloat(h.dataset.precio) * parseFloat(r.dataset.factor);
+        document.getElementById('total').textContent = '$ ' + Math.round(total).toLocaleString('es-AR')
+            + (noches > 0 ? ' (' + noches + ' noches)' : '');
+    }
+    calcular();
+</script>
+</body>
+</html>

@@ -1,13 +1,15 @@
 package com.columbiaviajesweb.columbia_springboot.repository;
 
-import com.columbiaviajes.entity.Vuelo;
+import com.columbiaviajesweb.columbia_springboot.entity.Vuelo;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.List;
 
-@Repository
 public interface VueloRepository extends JpaRepository<Vuelo, Long> {
-    Optional<Vuelo> findByNumeroVuelo(Integer numeroVuelo);
-    boolean existsByNumeroVuelo(Integer numeroVuelo);
+    boolean existsByNumeroIgnoreCaseAndIdNot(String numero, Long id);
+
+    List<Vuelo> findAllByOrderByFechaHoraAsc();
+
+    List<Vuelo> findTop5ByFechaHoraAfterOrderByFechaHoraAsc(LocalDateTime desde);
 }

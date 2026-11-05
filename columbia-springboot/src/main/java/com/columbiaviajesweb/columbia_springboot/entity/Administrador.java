@@ -1,26 +1,18 @@
 package com.columbiaviajesweb.columbia_springboot.entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import javax.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 /**
- * Entidad Administrador que hereda de Usuario
- * Puede gestionar vendedores y clientes pero no dueños
+ * Administrador del sistema: administra todo.
  */
 @Entity
 @Table(name = "administradores")
-@Data
-@EqualsAndHashCode(callSuper = true)
-@PrimaryKeyJoinColumn(name = "usuario_id")
 public class Administrador extends Usuario {
-    
-    public Administrador() {
-        super();
-    }
-    
-    public Administrador(String nombre, String apellido, String codigoUsuario, 
-                         String clave, String direccion, String email, String telefono) {
-        super(nombre, apellido, codigoUsuario, clave, "ADMINISTRADOR", direccion, email, telefono);
-    }
+
+    @Override public Rol getRol() { return Rol.ADMINISTRADOR; }
+    @Override public String getPaginaInicio() { return "/panel"; }
+    @Override public boolean puedeGestionarReservas() { return true; }
+    @Override public boolean puedeAdministrar() { return true; }
+    @Override public boolean puedeVerRanking() { return true; }
 }

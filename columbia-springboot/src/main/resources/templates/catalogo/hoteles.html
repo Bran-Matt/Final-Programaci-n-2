@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Hoteles')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container">
+    <div class="cv-encabezado">
+        <div>
+            <h1>Hoteles</h1>
+            <p>Hoteles contratados en exclusiva por la cadena.</p>
+        </div>
+        <a th:if="${usuarioActual.puedeAdministrar()}" th:href="@{/admin/hoteles/nuevo}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Nuevo hotel</a>
+    </div>
+    <div th:replace="~{fragments/layout :: mensajes}"></div>
+
+    <div th:if="${hoteles.isEmpty()}" class="cv-card cv-vacio"><i class="bi bi-building"></i>No hay hoteles cargados</div>
+    <div class="row g-3">
+        <div class="col-md-6 col-xl-4" th:each="h : ${hoteles}">
+            <div class="cv-card cv-card-hover p-4 h-100 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="cv-icono naranja"><i class="bi bi-building"></i></span>
+                    <span class="badge badge-gris" th:text="${h.codigo}">H001</span>
+                </div>
+                <h5 class="fw-bold mt-2 mb-1" th:text="${h.nombre}">Hotel</h5>
+                <div class="text-suave small mb-3"><i class="bi bi-geo-alt me-1"></i><span th:text="${h.direccion} + ', ' + ${h.ciudad}"></span></div>
+                <div class="d-flex justify-content-between small mb-1">
+                    <span class="text-suave"><i class="bi bi-telephone me-1"></i><span th:text="${h.telefono}"></span></span>
+                    <span><b th:text="${@reservaService.plazasLibresHoy(h)}"></b> / <span th:text="${h.plazasDisponibles}"></span> plazas libres hoy</span>
+                </div>
+                <div class="d-flex align-items-baseline gap-1 mt-2 mb-3">
+                    <span class="fs-4 fw-bold" th:text="'$ ' + ${#numbers.formatDecimal(h.precioNoche, 1, 'POINT', 0, 'COMMA')}"></span>
+                    <span class="text-suave small">por noche (media pensión)</span>
+                </div>
+                <div class="mt-auto d-flex gap-2" th:if="${usuarioActual.puedeAdministrar()}">
+                    <a th:href="@{/admin/hoteles/{id}/editar(id=${h.id})}" class="btn btn-sm btn-light"><i class="bi bi-pencil me-1"></i>Editar</a>
+                    <form th:action="@{/admin/hoteles/{id}/eliminar(id=${h.id})}" method="post" onsubmit="return confirm('¿Eliminar este hotel?')">
+                        <button class="btn btn-sm btn-light text-danger"><i class="bi bi-trash me-1"></i>Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

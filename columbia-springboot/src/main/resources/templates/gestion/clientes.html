@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Clientes')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container">
+    <div class="cv-encabezado">
+        <div>
+            <h1>Clientes</h1>
+            <p>Turistas que contrataron la cadena y la sucursal donde lo hicieron.</p>
+        </div>
+        <a th:href="@{/gestion/clientes/nuevo}" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>Nuevo cliente</a>
+    </div>
+    <div th:replace="~{fragments/layout :: mensajes}"></div>
+
+    <div class="cv-card overflow-hidden">
+        <div th:if="${clientes.isEmpty()}" class="cv-vacio"><i class="bi bi-people"></i>Todavía no hay clientes</div>
+        <div class="table-responsive" th:unless="${clientes.isEmpty()}">
+            <table class="table cv-tabla">
+                <thead><tr><th>Turista</th><th>Código</th><th>Contacto</th><th>Sucursal</th><th class="text-end">Reservas</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="c : ${clientes}">
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="cv-avatar" style="background:#ffeee8;color:#c2410c" th:text="${c.iniciales}"></span>
+                            <div>
+                                <div class="fw-semibold" th:text="${c.nombreCompleto}"></div>
+                                <small class="text-suave" th:text="${c.direccion}"></small>
+                            </div>
+                        </div>
+                    </td>
+                    <td><code th:text="${c.codigo}"></code></td>
+                    <td class="small"><div th:text="${c.email}"></div><div class="text-suave" th:text="${c.telefono}"></div></td>
+                    <td><span th:if="${c.sucursal != null}" class="badge badge-suave" th:text="${c.sucursal.codigo}"></span><span th:if="${c.sucursal == null}" class="text-suave">—</span></td>
+                    <td class="text-end">
+                        <div class="fw-semibold" th:text="${c.reservas.size()}"></div>
+                        <small class="text-suave" th:text="'$ ' + ${#numbers.formatDecimal(c.totalGastado, 1, 'POINT', 0, 'COMMA')}"></small>
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <div class="dropdown d-inline">
+                            <button class="btn btn-sm btn-light" data-bs-toggle="dropdown" title="Nueva reserva"><i class="bi bi-plus-lg"></i> Reservar</button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                <li><a class="dropdown-item" th:href="@{/gestion/reservas/vuelo/nueva(clienteId=${c.id})}"><i class="bi bi-airplane me-2"></i>Vuelo</a></li>
+                                <li><a class="dropdown-item" th:href="@{/gestion/reservas/hotel/nueva(clienteId=${c.id})}"><i class="bi bi-building me-2"></i>Hotel</a></li>
+                            </ul>
+                        </div>
+                        <a th:href="@{/gestion/clientes/{id}/editar(id=${c.id})}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
+                        <form class="d-inline" th:action="@{/gestion/clientes/{id}/eliminar(id=${c.id})}" method="post" onsubmit="return confirm('¿Eliminar este cliente y todas sus reservas?')">
+                            <button class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

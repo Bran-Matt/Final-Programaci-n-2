@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Usuarios')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container">
+    <div class="cv-encabezado">
+        <div>
+            <h1>Usuarios</h1>
+            <p>Todos los usuarios del sistema: dueño, administradores, vendedores y clientes.</p>
+        </div>
+        <a th:href="@{/admin/usuarios/nuevo}" class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>Nuevo usuario</a>
+    </div>
+    <div th:replace="~{fragments/layout :: mensajes}"></div>
+
+    <div class="cv-card overflow-hidden">
+        <div class="table-responsive">
+            <table class="table cv-tabla">
+                <thead><tr><th>Usuario</th><th>Código</th><th>Rol</th><th>Contacto</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="u : ${usuarios}">
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="cv-avatar" style="background:#e6edfb" th:text="${u.iniciales}"></span>
+                            <span class="fw-semibold" th:text="${u.nombreCompleto}"></span>
+                        </div>
+                    </td>
+                    <td><code th:text="${u.codigo}"></code></td>
+                    <td>
+                        <span class="badge" th:classappend="${u.rol.name() == 'DUENIO'} ? 'badge-violeta' : (${u.rol.name() == 'ADMINISTRADOR'} ? 'badge-rojo' : (${u.rol.name() == 'VENDEDOR'} ? 'badge-naranja' : 'badge-suave'))">
+                            <i class="bi me-1" th:classappend="${u.rol.icono}"></i><span th:text="${u.rol.etiqueta}"></span>
+                        </span>
+                    </td>
+                    <td class="small"><div th:text="${u.email}"></div><div class="text-suave" th:text="${u.telefono}"></div></td>
+                    <td class="text-end text-nowrap">
+                        <a th:href="@{/admin/usuarios/{id}/editar(id=${u.id})}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
+                        <form class="d-inline" th:action="@{/admin/usuarios/{id}/eliminar(id=${u.id})}" method="post" onsubmit="return confirm('¿Eliminar este usuario?')">
+                            <button class="btn btn-sm btn-light text-danger" th:disabled="${u.id == usuarioActual.id}"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

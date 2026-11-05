@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Ranking de vendedores')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container">
+    <div class="cv-encabezado">
+        <div>
+            <h1>Ranking de vendedores</h1>
+            <p>Vendedores ordenados según cuánto facturaron.</p>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="cv-card cv-stat"><span class="cv-icono verde"><i class="bi bi-cash-stack"></i></span>
+                <div><div class="valor" th:text="'$ ' + ${#numbers.formatDecimal(total, 1, 'POINT', 0, 'COMMA')}"></div><div class="etiqueta">Facturación total</div></div></div>
+        </div>
+        <div class="col-md-4">
+            <div class="cv-card cv-stat"><span class="cv-icono azul"><i class="bi bi-ticket-perforated"></i></span>
+                <div><div class="valor" th:text="${reservas}"></div><div class="etiqueta">Reservas vendidas</div></div></div>
+        </div>
+        <div class="col-md-4">
+            <div class="cv-card cv-stat"><span class="cv-icono violeta"><i class="bi bi-trophy"></i></span>
+                <div><div class="valor text-truncate" th:text="${ranking.isEmpty()} ? '—' : ${ranking[0].vendedor.nombreCompleto}"></div><div class="etiqueta">Mejor vendedor</div></div></div>
+        </div>
+    </div>
+
+    <div class="cv-card overflow-hidden">
+        <div th:if="${ranking.isEmpty()}" class="cv-vacio"><i class="bi bi-people"></i>No hay vendedores cargados</div>
+        <div class="table-responsive" th:unless="${ranking.isEmpty()}">
+            <table class="table cv-tabla">
+                <thead><tr><th style="width:70px">#</th><th>Vendedor</th><th>Sucursal</th><th class="text-center">Reservas</th><th style="width:30%">Facturado</th></tr></thead>
+                <tbody>
+                <tr th:each="f : ${ranking}">
+                    <td><span class="cv-podio" th:classappend="${f.posicion() <= 3} ? 'p' + ${f.posicion()}" th:text="${f.posicion()}"></span></td>
+                    <td>
+                        <div class="fw-semibold" th:text="${f.vendedor().nombreCompleto}"></div>
+                        <small class="text-suave" th:text="${f.vendedor().email}"></small>
+                    </td>
+                    <td><span th:if="${f.vendedor().sucursal != null}" class="badge badge-suave" th:text="${f.vendedor().sucursal.codigo}"></span></td>
+                    <td class="text-center fw-semibold" th:text="${f.reservas()}"></td>
+                    <td>
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="fw-bold" th:text="'$ ' + ${#numbers.formatDecimal(f.facturado(), 1, 'POINT', 0, 'COMMA')}"></span>
+                        </div>
+                        <div class="progress"><div class="progress-bar" th:style="'width:' + ${f.porcentaje()} + '%'"></div></div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

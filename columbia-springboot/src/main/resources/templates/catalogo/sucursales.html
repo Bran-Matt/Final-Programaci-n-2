@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Sucursales')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container">
+    <div class="cv-encabezado">
+        <div>
+            <h1>Sucursales</h1>
+            <p>Agencias que forman parte de la cadena.</p>
+        </div>
+        <a th:if="${usuarioActual.puedeAdministrar()}" th:href="@{/admin/sucursales/nuevo}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Nueva sucursal</a>
+    </div>
+    <div th:replace="~{fragments/layout :: mensajes}"></div>
+
+    <div class="cv-card overflow-hidden">
+        <div th:if="${sucursales.isEmpty()}" class="cv-vacio"><i class="bi bi-shop"></i>No hay sucursales cargadas</div>
+        <div class="table-responsive" th:unless="${sucursales.isEmpty()}">
+            <table class="table cv-tabla">
+                <thead><tr><th>Código</th><th>Dirección</th><th>E-mail</th><th>Teléfono</th><th th:if="${usuarioActual.puedeAdministrar()}"></th></tr></thead>
+                <tbody>
+                <tr th:each="s : ${sucursales}">
+                    <td><span class="badge badge-suave" th:text="${s.codigo}"></span></td>
+                    <td class="fw-semibold" th:text="${s.direccion}"></td>
+                    <td><a th:href="'mailto:' + ${s.email}" th:text="${s.email}"></a></td>
+                    <td th:text="${s.telefono}"></td>
+                    <td class="text-end text-nowrap" th:if="${usuarioActual.puedeAdministrar()}">
+                        <a th:href="@{/admin/sucursales/{id}/editar(id=${s.id})}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
+                        <form class="d-inline" th:action="@{/admin/sucursales/{id}/eliminar(id=${s.id})}" method="post" onsubmit="return confirm('¿Eliminar esta sucursal?')">
+                            <button class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>
