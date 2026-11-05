@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Panel')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container">
+    <div class="cv-encabezado">
+        <div>
+            <h1>Hola, <span th:text="${usuarioActual.nombre}">Ana</span> 👋</h1>
+            <p>Este es el resumen de la agencia hoy.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/gestion/reservas/vuelo/nueva}" class="btn btn-primary"><i class="bi bi-airplane me-1"></i>Reservar vuelo</a>
+            <a th:href="@{/gestion/reservas/hotel/nueva}" class="btn btn-acento"><i class="bi bi-building me-1"></i>Reservar hotel</a>
+        </div>
+    </div>
+    <div th:replace="~{fragments/layout :: mensajes}"></div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="cv-card cv-stat"><span class="cv-icono azul"><i class="bi bi-ticket-perforated"></i></span>
+                <div><div class="valor" th:text="${totalReservas}">0</div><div class="etiqueta">Reservas</div></div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="cv-card cv-stat"><span class="cv-icono naranja"><i class="bi bi-people"></i></span>
+                <div><div class="valor" th:text="${totalClientes}">0</div><div class="etiqueta">Clientes</div></div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="cv-card cv-stat"><span class="cv-icono violeta"><i class="bi bi-airplane"></i></span>
+                <div><div class="valor"><span th:text="${totalVuelos}">0</span> <small class="fs-6 text-suave">/ <span th:text="${totalHoteles}">0</span> hoteles</small></div><div class="etiqueta">Vuelos y hoteles</div></div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="cv-card cv-stat"><span class="cv-icono verde"><i class="bi bi-cash-stack"></i></span>
+                <div><div class="valor" th:text="'$ ' + ${#numbers.formatDecimal(facturacion, 1, 'POINT', 0, 'COMMA')}">$ 0</div><div class="etiqueta">Facturación total</div></div></div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="cv-card h-100 overflow-hidden">
+                <div class="d-flex justify-content-between align-items-center p-3 px-4 border-bottom">
+                    <h6 class="fw-bold m-0">Últimas reservas</h6>
+                    <a th:href="@{/gestion/reservas}" class="small">Ver todas</a>
+                </div>
+                <div th:if="${ultimasReservas.isEmpty()}" class="cv-vacio"><i class="bi bi-inbox"></i>Todavía no hay reservas</div>
+                <div class="list-group list-group-flush">
+                    <div th:each="r : ${ultimasReservas}" class="list-group-item px-4 py-3 d-flex align-items-center gap-3">
+                        <span class="cv-icono" th:classappend="${r.tipo == 'Vuelo'} ? 'azul' : 'naranja'"><i class="bi" th:classappend="${r.icono}"></i></span>
+                        <div class="flex-grow-1">
+                            <div class="fw-semibold" th:text="${r.cliente.nombreCompleto}">Cliente</div>
+                            <small class="text-suave" th:text="${r.descripcion}">desc</small>
+                        </div>
+                        <span class="fw-semibold" th:text="'$ ' + ${#numbers.formatDecimal(r.importe, 1, 'POINT', 0, 'COMMA')}">$</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="cv-card h-100 overflow-hidden">
+                <div class="d-flex justify-content-between align-items-center p-3 px-4 border-bottom">
+                    <h6 class="fw-bold m-0">Próximos vuelos</h6>
+                    <a th:href="@{/vuelos}" class="small">Ver todos</a>
+                </div>
+                <div th:if="${proximosVuelos.isEmpty()}" class="cv-vacio"><i class="bi bi-airplane"></i>No hay vuelos próximos</div>
+                <div class="list-group list-group-flush">
+                    <div th:each="v : ${proximosVuelos}" class="list-group-item px-4 py-3">
+                        <div class="d-flex justify-content-between">
+                            <span class="fw-semibold" th:text="${v.ruta}">BA → BRC</span>
+                            <span class="badge badge-suave" th:text="${v.numero}">CV101</span>
+                        </div>
+                        <small class="text-suave"><i class="bi bi-calendar-event me-1"></i><span th:text="${#temporals.format(v.fechaHora, 'dd/MM/yyyy HH:mm')}"></span>
+                            · <span th:text="${@reservaService.plazasLibres(v, 'TURISTA')}"></span> lugares en turista</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

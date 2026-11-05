@@ -1,64 +1,73 @@
 package com.columbiaviajesweb.columbia_springboot.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import javax.persistence.*;
-import java.io.Serializable;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * Entidad base Usuario que representa a todos los usuarios del sistema
- * Utiliza herencia con la estrategia JOINED para crear tablas separadas
- * Lombok genera automáticamente getters, setters, constructores, etc.
+ * Clase abstracta base de todos los usuarios del sistema (abstracción + herencia).
+ * Cada subclase define polimórficamente su rol, su página de inicio y sus permisos.
+ * Se persiste con la estrategia JOINED: una tabla "usuarios" y una tabla por subclase.
  */
 @Entity
 @Table(name = "usuarios")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Inheritance(strategy = InheritanceType.JOINED)
-public class Usuario implements Serializable {
-    
+@Getter
+@Setter
+public abstract class Usuario {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(name = "nombre", nullable = false, length = 100)
-    private String nombre;
-    
-    @Column(name = "apellido", nullable = false, length = 100)
-    private String apellido;
-    
-    @Column(name = "codigo_usuario", unique = true, nullable = false, length = 50)
-    private String codigoUsuario;
-    
-    @Column(name = "clave", nullable = false, length = 100)
+
+    /** Código con el que el usuario inicia sesión (para un turista, su código de turista). */
+    @Column(nullable = false, unique = true, length = 20)
+    private String codigo;
+
+    /** Clave guardada como hash BCrypt, nunca en texto plano. */
+    @Column(nullable = false, length = 100)
     private String clave;
-    
-    @Column(name = "rol", nullable = false, length = 20)
-    private String rol; // DUENIO, ADMINISTRADOR, VENDEDOR, CLIENTE
-    
-    @Column(name = "direccion", length = 200)
+
+    @Column(nullable = false, length = 60)
+    private String nombre;
+
+    @Column(nullable = false, length = 80)
+    private String apellidos;
+
+    @Column(length = 150)
     private String direccion;
-    
-    @Column(name = "email", length = 100)
+
+    @Column(length = 100)
     private String email;
-    
-    @Column(name = "telefono", length = 20)
+
+    @Column(length = 30)
     private String telefono;
-    
-    /**
-     * Constructor para clases herederas
-     */
-    public Usuario(String nombre, String apellido, String codigoUsuario, 
-                   String clave, String rol, String direccion, String email, String telefono) {
-        this.nombre = nombre;
-        this.apellido = apellido;
-        this.codigoUsuario = codigoUsuario;
-        this.clave = clave;
-        this.rol = rol;
-        this.direccion = direccion;
-        this.email = email;
-        this.telefono = telefono;
+
+    /** Rol del usuario. Lo resuelve cada subclase. */
+    public abstract Rol getRol();
+
+    /** Página a la que se lo redirige al iniciar sesión. */
+    public abstract String getPaginaInicio();
+
+    /** Puede ver sus propias reservas (solo consulta). */
+    public boolean puedeVerMisReservas() { return false; }
+
+    /** Puede administrar clientes y reservas. */
+    public boolean puedeGestionarReservas() { return false; }
+
+    /** Puede administrar sucursales, hoteles, vuelos y usuarios. */
+    public boolean puedeAdministrar() { return false; }
+
+    /** Puede ver el ranking de vendedores por facturación. */
+    public boolean puedeVerRanking() { return false; }
+
+    public String getNombreCompleto() {
+        return nombre + " " + apellidos;
+    }
+
+    public String getIniciales() {
+        String a = nombre == null || nombre.isEmpty() ? "" : nombre.substring(0, 1);
+        String b = apellidos == null || apellidos.isEmpty() ? "" : apellidos.substring(0, 1);
+        return (a + b).toUpperCase();
     }
 }

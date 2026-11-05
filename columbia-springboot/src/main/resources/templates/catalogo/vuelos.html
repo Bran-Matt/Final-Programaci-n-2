@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Vuelos')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container">
+    <div class="cv-encabezado">
+        <div>
+            <h1>Vuelos</h1>
+            <p>Vuelos regulares contratados en exclusiva por la cadena.</p>
+        </div>
+        <a th:if="${usuarioActual.puedeAdministrar()}" th:href="@{/admin/vuelos/nuevo}" class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Nuevo vuelo</a>
+    </div>
+    <div th:replace="~{fragments/layout :: mensajes}"></div>
+
+    <div th:if="${vuelos.isEmpty()}" class="cv-card cv-vacio"><i class="bi bi-airplane"></i>No hay vuelos cargados</div>
+    <div class="row g-3">
+        <div class="col-md-6 col-xl-4" th:each="v : ${vuelos}">
+            <div class="cv-card cv-card-hover p-4 h-100 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <span class="badge badge-suave fs-6" th:text="${v.numero}">CV101</span>
+                    <small class="text-suave"><i class="bi bi-calendar-event me-1"></i><span th:text="${#temporals.format(v.fechaHora, 'dd/MM/yyyy · HH:mm')}"></span></small>
+                </div>
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <div class="fw-bold fs-5" th:text="${v.origen}">Buenos Aires</div>
+                    <i class="bi bi-arrow-right text-suave"></i>
+                    <div class="fw-bold fs-5" th:text="${v.destino}">Bariloche</div>
+                </div>
+                <div class="row g-2 small mb-3">
+                    <div class="col-6">
+                        <div class="p-2 rounded-3 bg-light">
+                            <div class="text-suave">Turista</div>
+                            <div class="fw-semibold" th:text="'$ ' + ${#numbers.formatDecimal(v.precioTurista, 1, 'POINT', 0, 'COMMA')}"></div>
+                            <div><span th:text="${@reservaService.plazasLibres(v, 'TURISTA')}"></span> / <span th:text="${v.plazasTurista}"></span> libres</div>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="p-2 rounded-3 bg-light">
+                            <div class="text-suave">Primera</div>
+                            <div class="fw-semibold" th:text="'$ ' + ${#numbers.formatDecimal(v.precioPrimera, 1, 'POINT', 0, 'COMMA')}"></div>
+                            <div><span th:text="${@reservaService.plazasLibres(v, 'PRIMERA')}"></span> / <span th:text="${v.plazasPrimera}"></span> libres</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-auto d-flex gap-2" th:if="${usuarioActual.puedeAdministrar()}">
+                    <a th:href="@{/admin/vuelos/{id}/editar(id=${v.id})}" class="btn btn-sm btn-light"><i class="bi bi-pencil me-1"></i>Editar</a>
+                    <form th:action="@{/admin/vuelos/{id}/eliminar(id=${v.id})}" method="post" onsubmit="return confirm('¿Eliminar este vuelo?')">
+                        <button class="btn btn-sm btn-light text-danger"><i class="bi bi-trash me-1"></i>Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

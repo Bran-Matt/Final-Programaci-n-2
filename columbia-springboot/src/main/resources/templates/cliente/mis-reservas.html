@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Mis viajes')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container">
+    <div class="cv-encabezado">
+        <div>
+            <h1>¡Hola, <span th:text="${cliente.nombre}">Juan</span>!</h1>
+            <p>Estos son tus viajes reservados con Columbia Viajes.</p>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="cv-card p-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <span class="cv-avatar cv-avatar-lg" th:text="${cliente.iniciales}"></span>
+                    <div>
+                        <h5 class="fw-bold m-0" th:text="${cliente.nombreCompleto}"></h5>
+                        <small class="text-suave">Código de turista: <b th:text="${cliente.codigo}"></b></small>
+                    </div>
+                </div>
+                <ul class="list-unstyled small m-0 d-grid gap-2">
+                    <li><i class="bi bi-geo-alt me-2 text-suave"></i><span th:text="${cliente.direccion}"></span></li>
+                    <li><i class="bi bi-envelope me-2 text-suave"></i><span th:text="${cliente.email}"></span></li>
+                    <li><i class="bi bi-telephone me-2 text-suave"></i><span th:text="${cliente.telefono}"></span></li>
+                </ul>
+                <div class="border-top mt-3 pt-3" th:if="${cliente.sucursal != null}">
+                    <small class="text-suave d-block mb-1">Tu sucursal</small>
+                    <div class="fw-semibold"><i class="bi bi-shop me-1"></i><span th:text="${cliente.sucursal.codigo}"></span></div>
+                    <small class="d-block" th:text="${cliente.sucursal.direccion}"></small>
+                    <small class="d-block text-suave" th:text="${cliente.sucursal.telefono} + ' · ' + ${cliente.sucursal.email}"></small>
+                </div>
+                <div class="border-top mt-3 pt-3 d-flex justify-content-between">
+                    <span class="text-suave">Total de tus reservas</span>
+                    <span class="fw-bold" th:text="'$ ' + ${#numbers.formatDecimal(cliente.totalGastado, 1, 'POINT', 0, 'COMMA')}"></span>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-8">
+            <div th:if="${cliente.reservas.isEmpty()}" class="cv-card cv-vacio">
+                <i class="bi bi-suitcase2"></i>Todavía no tenés reservas. Acercate a tu sucursal para armar tu viaje.
+            </div>
+            <div class="d-grid gap-3">
+                <div th:each="r : ${cliente.reservas}" class="cv-card cv-ticket p-4" th:classappend="${r.tipo == 'Hotel'} ? 'hotel'">
+                    <div class="d-flex justify-content-between align-items-start gap-3">
+                        <div class="d-flex gap-3">
+                            <span class="cv-icono" th:classappend="${r.tipo == 'Vuelo'} ? 'azul' : 'naranja'"><i class="bi" th:classappend="${r.icono}"></i></span>
+                            <div>
+                                <small class="text-suave" th:text="${r.tipo} + ' · ' + ${r.codigo}"></small>
+                                <h5 class="fw-bold mb-1" th:text="${r.descripcion}"></h5>
+                                <div class="text-suave" th:text="${r.detalle}"></div>
+                            </div>
+                        </div>
+                        <div class="text-end">
+                            <div class="fs-5 fw-bold text-nowrap" th:text="'$ ' + ${#numbers.formatDecimal(r.importe, 1, 'POINT', 0, 'COMMA')}"></div>
+                            <small class="text-suave" th:if="${r.vendedor != null}" th:text="'Vendido por ' + ${r.vendedor.nombre}"></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${titulo})}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container" style="max-width: 900px">
+    <div class="cv-encabezado">
+        <div class="d-flex align-items-center gap-3">
+            <span class="cv-icono azul"><i class="bi bi-airplane"></i></span>
+            <div><h1 th:text="${titulo}">Reserva de vuelo</h1><p>Elegí el vuelo y la clase en la que viaja el turista.</p></div>
+        </div>
+    </div>
+    <div th:replace="~{fragments/layout :: mensajes}"></div>
+    <form class="cv-card p-4" th:action="@{/gestion/reservas/vuelo}" th:object="${form}" method="post" oninput="calcular()">
+        <input type="hidden" th:field="*{id}">
+        <div class="row g-3 mb-4">
+            <div th:class="${usuarioActual.puedeAdministrar()} ? 'col-md-6' : 'col-12'">
+                <label class="form-label" for="clienteId">Turista</label>
+                <select class="form-select" th:field="*{clienteId}" required>
+                    <option value="">Elegí un cliente...</option>
+                    <option th:each="c : ${clientes}" th:value="${c.id}" th:text="${c.nombreCompleto} + ' (' + ${c.codigo} + ')'"></option>
+                </select>
+                <small class="text-suave">¿No está? <a th:href="@{/gestion/clientes/nuevo}">Dar de alta un cliente</a></small>
+            </div>
+            <div class="col-md-6" th:if="${usuarioActual.puedeAdministrar()}">
+                <label class="form-label" for="vendedorId">Vendedor que factura</label>
+                <select class="form-select" th:field="*{vendedorId}">
+                    <option value="">Sin vendedor</option>
+                    <option th:each="v : ${vendedores}" th:value="${v.id}" th:text="${v.nombreCompleto}"></option>
+                </select>
+            </div>
+        </div>
+        <label class="form-label">Vuelo</label>
+        <div class="row g-2 mb-4">
+            <div class="col-md-6" th:each="v : ${vuelos}">
+                <input type="radio" class="btn-check" th:field="*{vueloId}" th:value="${v.id}" th:id="'vuelo-' + ${v.id}"
+                       th:attr="data-turista=${v.precioTurista},data-primera=${v.precioPrimera}">
+                <label class="cv-opcion" th:for="'vuelo-' + ${v.id}">
+                    <div class="d-flex justify-content-between">
+                        <span class="fw-bold" th:text="${v.ruta}"></span>
+                        <span class="badge badge-suave" th:text="${v.numero}"></span>
+                    </div>
+                    <small class="text-suave d-block mt-1"><i class="bi bi-calendar-event me-1"></i><span th:text="${#temporals.format(v.fechaHora, 'dd/MM/yyyy HH:mm')}"></span></small>
+                    <small class="d-block mt-1">
+                        Turista: <b th:text="${@reservaService.plazasLibres(v, 'TURISTA')}"></b> libres ·
+                        Primera: <b th:text="${@reservaService.plazasLibres(v, 'PRIMERA')}"></b> libres
+                    </small>
+                </label>
+            </div>
+        </div>
+        <label class="form-label">Clase</label>
+        <div class="row g-2">
+            <div class="col-6" th:each="c : ${clases}">
+                <input type="radio" class="btn-check" th:field="*{clase}" th:value="${c}" th:id="'clase-' + ${c}">
+                <label class="cv-opcion text-center" th:for="'clase-' + ${c}">
+                    <i class="bi fs-4 d-block mb-1" th:classappend="${c.name() == 'TURISTA'} ? 'bi-person' : 'bi-star'"></i>
+                    <span class="fw-semibold" th:text="${c.etiqueta}"></span>
+                </label>
+            </div>
+        </div>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mt-4 pt-3 border-top">
+            <div><span class="text-suave">Importe estimado:</span> <span class="fs-4 fw-bold ms-1" id="total">$ 0</span></div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/gestion/reservas}" class="btn btn-light">Cancelar</a>
+                <button class="btn btn-primary" type="submit"><i class="bi bi-check-lg me-1"></i>Guardar reserva</button>
+            </div>
+        </div>
+    </form>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+<script>
+    function calcular() {
+        var v = document.querySelector('input[name="vueloId"]:checked');
+        var c = document.querySelector('input[name="clase"]:checked');
+        var total = 0;
+        if (v && c) total = parseFloat(c.value === 'TURISTA' ? v.dataset.turista : v.dataset.primera);
+        document.getElementById('total').textContent = '$ ' + Math.round(total).toLocaleString('es-AR');
+    }
+    calcular();
+</script>
+</body>
+</html>

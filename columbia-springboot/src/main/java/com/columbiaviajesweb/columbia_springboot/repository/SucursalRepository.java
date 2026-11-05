@@ -1,13 +1,12 @@
 package com.columbiaviajesweb.columbia_springboot.repository;
 
-import com.columbiaviajes.entity.Sucursal;
+import com.columbiaviajesweb.columbia_springboot.entity.Sucursal;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.List;
 
-@Repository
 public interface SucursalRepository extends JpaRepository<Sucursal, Long> {
-    Optional<Sucursal> findByCodigo(String codigo);
-    boolean existsByCodigo(String codigo);
+    boolean existsByCodigoIgnoreCaseAndIdNot(String codigo, Long id);
+
+    List<Sucursal> findAllByOrderByCodigoAsc();
 }

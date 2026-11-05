@@ -1,42 +1,36 @@
 package com.columbiaviajesweb.columbia_springboot.entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import javax.persistence.*;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Entidad Cliente que hereda de Usuario
- * Tiene asignaciones a sucursal, hotel y vuelo
+ * Turista que contrata los servicios de la cadena. Solo puede consultar su información.
  */
 @Entity
 @Table(name = "clientes")
-@Data
-@EqualsAndHashCode(callSuper = true)
-@PrimaryKeyJoinColumn(name = "usuario_id")
+@Getter
+@Setter
 public class Cliente extends Usuario {
-    
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    /** Sucursal que contrató el turista. */
+    @ManyToOne
     @JoinColumn(name = "sucursal_id")
-    private Sucursal sucursalAsignada;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "vuelo_id")
-    private Vuelo vueloAsignado;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "hotel_id")
-    private Hotel hotelAsignado;
-    
-    public Cliente() {
-        super();
-    }
-    
-    public Cliente(String nombre, String apellido, String codigoUsuario, 
-                   String clave, String direccion, String email, String telefono,
-                   Sucursal sucursal, Hotel hotel, Vuelo vuelo) {
-        super(nombre, apellido, codigoUsuario, clave, "CLIENTE", direccion, email, telefono);
-        this.sucursalAsignada = sucursal;
-        this.hotelAsignado = hotel;
-        this.vueloAsignado = vuelo;
+    private Sucursal sucursal;
+
+    @OneToMany(mappedBy = "cliente", cascade = CascadeType.REMOVE)
+    @OrderBy("fechaReserva DESC")
+    private List<Reserva> reservas = new ArrayList<>();
+
+    @Override public Rol getRol() { return Rol.CLIENTE; }
+    @Override public String getPaginaInicio() { return "/cliente/mis-reservas"; }
+    @Override public boolean puedeVerMisReservas() { return true; }
+
+    /** Total gastado por el turista en todas sus reservas. */
+    public double getTotalGastado() {
+        return reservas.stream().mapToDouble(Reserva::getImporte).sum();
     }
 }

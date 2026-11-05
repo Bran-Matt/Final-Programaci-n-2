@@ -1,31 +1,32 @@
 package com.columbiaviajesweb.columbia_springboot.service;
 
-import com.columbiaviajes.entity.Sucursal;
-import com.columbiaviajes.repository.SucursalRepository;
-import lombok.RequiredArgsConstructor;
+import com.columbiaviajesweb.columbia_springboot.entity.Sucursal;
+import com.columbiaviajesweb.columbia_springboot.exception.ReglaNegocioException;
+import com.columbiaviajesweb.columbia_springboot.repository.SucursalRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
-public class SucursalService {
-    
-    private final SucursalRepository sucursalRepository;
-    
-    public List<Sucursal> obtenerTodas() {
-        return sucursalRepository.findAll();
+@Transactional
+public class SucursalService extends ServicioBase<Sucursal> {
+
+    private final SucursalRepository repo;
+
+    public SucursalService(SucursalRepository repo) { this.repo = repo; }
+
+    @Override protected JpaRepository<Sucursal, Long> repositorio() { return repo; }
+    @Override protected String nombreEntidad() { return "la sucursal"; }
+
+    @Override
+    protected void validar(Sucursal s) {
+        if (repo.existsByCodigoIgnoreCaseAndIdNot(s.getCodigo(), idONinguno(s.getId()))) {
+            throw new ReglaNegocioException("Ya existe una sucursal con el código " + s.getCodigo());
+        }
     }
-    
-    public Optional<Sucursal> buscarPorCodigo(String codigo) {
-        return sucursalRepository.findByCodigo(codigo);
-    }
-    
-    public Sucursal guardarSucursal(Sucursal sucursal) {
-        return sucursalRepository.save(sucursal);
-    }
-    
-    public boolean existeSucursal(String codigo) {
-        return sucursalRepository.existsByCodigo(codigo);
-    }
+
+    @Override
+    public List<Sucursal> listar() { return repo.findAllByOrderByCodigoAsc(); }
 }

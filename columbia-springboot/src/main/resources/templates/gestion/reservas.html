@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reservas')}"></head>
+<body>
+<nav th:replace="~{fragments/layout :: navbar}"></nav>
+<main class="container">
+    <div class="cv-encabezado">
+        <div>
+            <h1>Reservas</h1>
+            <p>Vuelos y hospedajes reservados para los turistas.</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a th:href="@{/gestion/reservas/vuelo/nueva}" class="btn btn-primary"><i class="bi bi-airplane me-1"></i>Reservar vuelo</a>
+            <a th:href="@{/gestion/reservas/hotel/nueva}" class="btn btn-acento"><i class="bi bi-building me-1"></i>Reservar hotel</a>
+        </div>
+    </div>
+    <div th:replace="~{fragments/layout :: mensajes}"></div>
+
+    <div class="cv-card overflow-hidden">
+        <div th:if="${reservas.isEmpty()}" class="cv-vacio"><i class="bi bi-ticket-perforated"></i>Todavía no hay reservas</div>
+        <div class="table-responsive" th:unless="${reservas.isEmpty()}">
+            <table class="table cv-tabla">
+                <thead><tr><th>Reserva</th><th>Turista</th><th>Detalle</th><th>Vendedor</th><th class="text-end">Importe</th><th></th></tr></thead>
+                <tbody>
+                <tr th:each="r : ${reservas}">
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="cv-icono" style="width:38px;height:38px;font-size:1rem" th:classappend="${r.tipo == 'Vuelo'} ? 'azul' : 'naranja'"><i class="bi" th:classappend="${r.icono}"></i></span>
+                            <div>
+                                <div class="fw-semibold" th:text="${r.codigo}"></div>
+                                <small class="text-suave" th:text="${#temporals.format(r.fechaReserva, 'dd/MM/yyyy')}"></small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="fw-semibold" th:text="${r.cliente.nombreCompleto}"></div>
+                        <small class="text-suave" th:text="${r.cliente.codigo}"></small>
+                    </td>
+                    <td>
+                        <div th:text="${r.descripcion}"></div>
+                        <small class="text-suave" th:text="${r.detalle}"></small>
+                    </td>
+                    <td th:text="${r.vendedor != null} ? ${r.vendedor.nombreCompleto} : '—'"></td>
+                    <td class="text-end fw-semibold text-nowrap" th:text="'$ ' + ${#numbers.formatDecimal(r.importe, 1, 'POINT', 0, 'COMMA')}"></td>
+                    <td class="text-end text-nowrap">
+                        <a th:href="@{/gestion/reservas/{id}/editar(id=${r.id})}" class="btn btn-sm btn-light"><i class="bi bi-pencil"></i></a>
+                        <form class="d-inline" th:action="@{/gestion/reservas/{id}/eliminar(id=${r.id})}" method="post" onsubmit="return confirm('¿Cancelar esta reserva?')">
+                            <button class="btn btn-sm btn-light text-danger"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

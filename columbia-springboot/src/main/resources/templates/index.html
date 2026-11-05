@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Ingresar')}"></head>
+<body>
+<div class="cv-portada">
+    <section class="cv-hero">
+        <i class="bi bi-airplane-fill avion"></i>
+        <div class="d-flex align-items-center gap-2 fs-5 fw-bold">
+            <span class="cv-logo"><i class="bi bi-globe-americas"></i></span> Columbia Viajes
+        </div>
+        <div class="my-5" style="position: relative">
+            <h1>Tu próximo viaje<br>empieza acá.</h1>
+            <p class="lead mt-3">Vuelos y hoteles exclusivos de la cadena, gestionados desde cualquiera de nuestras sucursales.</p>
+            <div class="destinos mt-4">
+                <span><i class="bi bi-geo-alt me-1"></i>Bariloche</span>
+                <span><i class="bi bi-geo-alt me-1"></i>Iguazú</span>
+                <span><i class="bi bi-geo-alt me-1"></i>Mendoza</span>
+                <span><i class="bi bi-geo-alt me-1"></i>Mar del Plata</span>
+            </div>
+        </div>
+        <small class="opacity-75">www.columbiaviajes.com.ar</small>
+    </section>
+
+    <section class="cv-login">
+        <form th:action="@{/login}" method="post">
+            <h2 class="fw-bold mb-1">Ingresar</h2>
+            <p class="text-suave mb-4">Usá tu código de usuario y tu clave.</p>
+
+            <div th:if="${error}" class="alert alert-danger border-0 py-2 d-flex align-items-center gap-2">
+                <i class="bi bi-exclamation-circle"></i><span th:text="${error}"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label" for="codigo">Código de usuario</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-person"></i></span>
+                    <input class="form-control" id="codigo" name="codigo" th:value="${codigo}" required autofocus placeholder="ej: cliente1">
+                </div>
+            </div>
+            <div class="mb-4">
+                <label class="form-label" for="clave">Clave</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white"><i class="bi bi-lock"></i></span>
+                    <input class="form-control" id="clave" name="clave" type="password" required placeholder="••••">
+                </div>
+            </div>
+            <button class="btn btn-primary w-100 py-2" type="submit">Ingresar <i class="bi bi-arrow-right ms-1"></i></button>
+
+            <div class="mt-5">
+                <p class="small text-suave mb-2"><i class="bi bi-info-circle me-1"></i>Usuarios de prueba (clave <b>1234</b>). Tocá uno para completar:</p>
+                <div class="cv-demo d-grid gap-2" style="grid-template-columns: 1fr 1fr">
+                    <button type="button" class="btn btn-light btn-sm" data-codigo="cliente1"><i class="bi bi-person me-1"></i>Cliente</button>
+                    <button type="button" class="btn btn-light btn-sm" data-codigo="vendedor1"><i class="bi bi-briefcase me-1"></i>Vendedor</button>
+                    <button type="button" class="btn btn-light btn-sm" data-codigo="admin"><i class="bi bi-shield-lock me-1"></i>Administrador</button>
+                    <button type="button" class="btn btn-light btn-sm" data-codigo="duenio"><i class="bi bi-gem me-1"></i>Dueño</button>
+                </div>
+            </div>
+        </form>
+    </section>
+</div>
+<script>
+    document.querySelectorAll('.cv-demo button').forEach(function (b) {
+        b.addEventListener('click', function () {
+            document.getElementById('codigo').value = b.dataset.codigo;
+            document.getElementById('clave').value = '1234';
+        });
+    });
+</script>
+</body>
+</html>

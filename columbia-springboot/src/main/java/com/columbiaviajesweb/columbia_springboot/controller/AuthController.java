@@ -1,67 +1,62 @@
 package com.columbiaviajesweb.columbia_springboot.controller;
 
-import com.columbiaviajes.entity.Usuario;
-import com.columbiaviajes.service.UsuarioService;
-import lombok.RequiredArgsConstructor;
+import com.columbiaviajesweb.columbia_springboot.config.SesionInterceptor;
+import com.columbiaviajesweb.columbia_springboot.entity.Usuario;
+import com.columbiaviajesweb.columbia_springboot.repository.UsuarioRepository;
+import com.columbiaviajesweb.columbia_springboot.service.UsuarioService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import javax.servlet.http.HttpSession;
+
+import java.util.Optional;
 
 /**
- * Controlador para autenticación y login
- * Maneja el inicio y cierre de sesión
+ * Inicio y cierre de sesión.
  */
 @Controller
-@RequestMapping("/auth")
-@RequiredArgsConstructor
 public class AuthController {
-    
+
     private final UsuarioService usuarioService;
-    
-    /**
-     * Muestra la página de login
-     */
-    @GetMapping("/login")
-    public String mostrarLogin(Model model) {
-        model.addAttribute("titulo", "Columbia Viajes - Login");
-        return "auth/login";
+    private final UsuarioRepository usuarioRepository;
+
+    public AuthController(UsuarioService usuarioService, UsuarioRepository usuarioRepository) {
+        this.usuarioService = usuarioService;
+        this.usuarioRepository = usuarioRepository;
     }
-    
-    /**
-     * Procesa el login del usuario
-     */
-    @PostMapping("/login")
-    public String procesarLogin(@RequestParam String codigo, 
-                               @RequestParam String clave,
-                               HttpSession session,
-                               Model model) {
-        
-        Usuario usuario = usuarioService.autenticarUsuario(codigo, clave);
-        
-        if (usuario != null) {
-            session.setAttribute("usuario", usuario);
-            
-            // Redirigir según el rol
-            return switch (usuario.getRol()) {
-                case "DUENIO" -> "redirect:/duenio/dashboard";
-                case "ADMINISTRADOR" -> "redirect:/admin/dashboard";
-                case "VENDEDOR" -> "redirect:/vendedor/dashboard";
-                case "CLIENTE" -> "redirect:/cliente/dashboard";
-                default -> "redirect:/auth/login?error=true";
-            };
-        } else {
-            model.addAttribute("error", "Código o clave incorrectos");
-            return "auth/login";
+
+    @GetMapping("/")
+    public String inicio(HttpSession session) {
+        Long id = (Long) session.getAttribute(SesionInterceptor.ATRIBUTO_SESION);
+        if (id != null) {
+            Optional<Usuario> u = usuarioRepository.findById(id);
+            if (u.isPresent()) return "redirect:" + u.get().getPaginaInicio();
         }
+        return "index";
     }
-    
-    /**
-     * Cierra la sesión del usuario
-     */
+
+    @PostMapping("/login")
+    public String login(@RequestParam String codigo, @RequestParam String clave,
+                        HttpSession session, Model model) {
+        Optional<Usuario> usuario = usuarioService.autenticar(codigo, clave);
+        if (usuario.isEmpty()) {
+            model.addAttribute("error", "Código o clave incorrectos");
+            model.addAttribute("codigo", codigo);
+            return "index";
+        }
+        session.setAttribute(SesionInterceptor.ATRIBUTO_SESION, usuario.get().getId());
+        // Polimorfismo: cada tipo de usuario sabe cuál es su página de inicio
+        return "redirect:" + usuario.get().getPaginaInicio();
+    }
+
     @GetMapping("/logout")
     public String logout(HttpSession session) {
         session.invalidate();
-        return "redirect:/auth/login";
+        return "redirect:/";
+    }
+
+    @GetMapping("/acceso-denegado")
+    public String accesoDenegado() {
+        return "acceso-denegado";
     }
 }

@@ -1,0 +1,114 @@
+/* ===== Columbia Viajes - estilos ===== */
+:root {
+  --cv-primario: #1746a2;
+  --cv-primario-oscuro: #0e2f6e;
+  --cv-acento: #ff7a59;
+  --cv-fondo: #f4f6fb;
+  --cv-texto-suave: #6b7280;
+  --bs-primary: #1746a2;
+  --bs-primary-rgb: 23, 70, 162;
+  --bs-link-color: #1746a2;
+  --bs-link-color-rgb: 23, 70, 162;
+  --bs-body-font-family: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+body { background: var(--cv-fondo); color: #1f2937; min-height: 100vh; display: flex; flex-direction: column; }
+main { flex: 1; }
+
+.btn-primary { --bs-btn-bg: var(--cv-primario); --bs-btn-border-color: var(--cv-primario);
+  --bs-btn-hover-bg: var(--cv-primario-oscuro); --bs-btn-hover-border-color: var(--cv-primario-oscuro);
+  --bs-btn-active-bg: var(--cv-primario-oscuro); }
+.btn-acento { background: var(--cv-acento); color: #fff; border: none; }
+.btn-acento:hover { background: #f2603c; color: #fff; }
+.btn { border-radius: .6rem; font-weight: 500; }
+
+/* Navbar */
+.cv-navbar { background: linear-gradient(90deg, var(--cv-primario-oscuro), var(--cv-primario)); box-shadow: 0 2px 12px rgba(14,47,110,.25); }
+.cv-navbar .navbar-brand { font-weight: 700; letter-spacing: -.02em; }
+.cv-navbar .nav-link { color: rgba(255,255,255,.8); border-radius: .5rem; padding: .45rem .8rem !important; }
+.cv-navbar .nav-link:hover, .cv-navbar .nav-link.active { color: #fff; background: rgba(255,255,255,.14); }
+.cv-logo { width: 34px; height: 34px; border-radius: 10px; background: var(--cv-acento);
+  display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 1.1rem; }
+.cv-avatar { width: 36px; height: 36px; border-radius: 50%; background: #fff; color: var(--cv-primario);
+  display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; }
+.cv-avatar-lg { width: 64px; height: 64px; font-size: 1.4rem; background: var(--cv-primario); color: #fff; }
+
+/* Encabezado de página */
+.cv-encabezado { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; margin: 2rem 0 1.5rem; }
+.cv-encabezado h1 { font-size: 1.75rem; font-weight: 700; margin: 0; letter-spacing: -.02em; }
+.cv-encabezado p { color: var(--cv-texto-suave); margin: .25rem 0 0; }
+
+/* Tarjetas */
+.cv-card { background: #fff; border: 1px solid #e7eaf3; border-radius: 1rem; box-shadow: 0 1px 3px rgba(16,24,40,.04); }
+.cv-card-hover { transition: transform .15s ease, box-shadow .15s ease; }
+.cv-card-hover:hover { transform: translateY(-3px); box-shadow: 0 10px 24px rgba(16,24,40,.08); }
+.cv-stat { padding: 1.25rem; display: flex; align-items: center; gap: 1rem; }
+.cv-stat .valor { font-size: 1.6rem; font-weight: 700; line-height: 1.1; }
+.cv-stat .etiqueta { color: var(--cv-texto-suave); font-size: .85rem; }
+.cv-icono { width: 48px; height: 48px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.35rem; flex-shrink: 0; }
+.cv-icono.azul { background: #e6edfb; color: var(--cv-primario); }
+.cv-icono.naranja { background: #ffeee8; color: #e8572f; }
+.cv-icono.verde { background: #e3f6ec; color: #15803d; }
+.cv-icono.violeta { background: #efe9fd; color: #6d28d9; }
+
+/* Tablas */
+.cv-tabla { margin: 0; }
+.cv-tabla thead th { background: #f8f9fc; color: var(--cv-texto-suave); font-weight: 600; font-size: .78rem;
+  text-transform: uppercase; letter-spacing: .04em; border-bottom: 1px solid #e7eaf3; padding: .85rem 1rem; }
+.cv-tabla td { padding: .85rem 1rem; vertical-align: middle; border-color: #f0f2f7; }
+.cv-tabla tbody tr:last-child td { border-bottom: none; }
+.cv-tabla tbody tr:hover { background: #fafbff; }
+
+.badge-suave { background: #e6edfb; color: var(--cv-primario); font-weight: 600; }
+.badge-naranja { background: #ffeee8; color: #c2410c; font-weight: 600; }
+.badge-verde { background: #e3f6ec; color: #15803d; font-weight: 600; }
+.badge-rojo { background: #fde8e8; color: #b91c1c; font-weight: 600; }
+.badge-violeta { background: #efe9fd; color: #6d28d9; font-weight: 600; }
+.badge-gris { background: #eef0f4; color: #4b5563; font-weight: 600; }
+
+/* Formularios */
+.form-control, .form-select { border-radius: .6rem; border-color: #dfe3ec; padding: .6rem .85rem; }
+.form-control:focus, .form-select:focus { border-color: var(--cv-primario); box-shadow: 0 0 0 .2rem rgba(23,70,162,.12); }
+.form-label { font-weight: 600; font-size: .88rem; color: #374151; }
+.cv-opcion { border: 2px solid #e7eaf3; border-radius: .9rem; padding: 1rem; cursor: pointer; transition: all .15s; height: 100%; display: block; }
+.cv-opcion:hover { border-color: #b9c8ea; }
+.btn-check:checked + .cv-opcion { border-color: var(--cv-primario); background: #f2f6fd; }
+
+/* Portada / login */
+.cv-portada { min-height: 100vh; display: grid; grid-template-columns: 1.1fr 1fr; }
+.cv-hero { position: relative; overflow: hidden; color: #fff; padding: 3rem 4rem; display: flex; flex-direction: column; justify-content: space-between;
+  background: radial-gradient(circle at 80% 20%, rgba(255,122,89,.55), transparent 45%),
+              radial-gradient(circle at 10% 90%, rgba(56,189,248,.35), transparent 40%),
+              linear-gradient(135deg, #0b2557 0%, #1746a2 60%, #2563eb 100%); }
+.cv-hero h1 { font-size: 3.2rem; font-weight: 800; letter-spacing: -.03em; line-height: 1.05; }
+.cv-hero .lead { color: rgba(255,255,255,.85); max-width: 32rem; }
+.cv-hero .avion { position: absolute; right: -40px; top: 32%; font-size: 16rem; opacity: .09; transform: rotate(-20deg); }
+.cv-hero .destinos span { display: inline-block; padding: .4rem .9rem; margin: 0 .4rem .5rem 0; border-radius: 999px;
+  background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.2); font-size: .85rem; }
+.cv-login { display: flex; align-items: center; justify-content: center; padding: 2rem; background: #fff; }
+.cv-login form { width: 100%; max-width: 380px; }
+.cv-demo button { text-align: left; }
+@media (max-width: 900px) {
+  .cv-portada { grid-template-columns: 1fr; }
+  .cv-hero { padding: 2rem 1.5rem; min-height: 320px; }
+  .cv-hero h1 { font-size: 2.2rem; }
+}
+
+/* Ranking */
+.cv-podio { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; background: #eef0f4; color: #4b5563; }
+.cv-podio.p1 { background: #fff3c4; color: #a16207; }
+.cv-podio.p2 { background: #e5e7eb; color: #374151; }
+.cv-podio.p3 { background: #fde4d0; color: #9a3412; }
+.progress { height: .5rem; border-radius: 999px; background: #eef0f4; }
+.progress-bar { background: linear-gradient(90deg, var(--cv-primario), #4f7fe0); border-radius: 999px; }
+
+/* Ticket de reserva */
+.cv-ticket { border-left: 4px solid var(--cv-primario); }
+.cv-ticket.hotel { border-left-color: var(--cv-acento); }
+
+.cv-vacio { text-align: center; padding: 3rem 1rem; color: var(--cv-texto-suave); }
+.cv-vacio i { font-size: 2.5rem; display: block; margin-bottom: .5rem; opacity: .5; }
+
+footer.cv-footer { color: var(--cv-texto-suave); font-size: .85rem; padding: 2rem 0; }
+.text-suave { color: var(--cv-texto-suave) !important; }
+.fw-semibold { font-weight: 600; }
