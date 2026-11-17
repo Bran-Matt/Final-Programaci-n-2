@@ -22,7 +22,7 @@
                 <tr th:each="c : ${clientes}">
                     <td>
                         <div class="d-flex align-items-center gap-2">
-                            <span class="cv-avatar" style="background:#ffeee8;color:#c2410c" th:text="${c.iniciales}"></span>
+                            <img class="cv-avatar" th:attr="data-blobatar=${c.codigo}" alt="">
                             <div>
                                 <div class="fw-semibold" th:text="${c.nombreCompleto}"></div>
                                 <small class="text-suave" th:text="${c.direccion}"></small>

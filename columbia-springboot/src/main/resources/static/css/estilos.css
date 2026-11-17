@@ -25,12 +25,13 @@ main { flex: 1; }
 /* Navbar */
 .cv-navbar { background: linear-gradient(90deg, var(--cv-primario-oscuro), var(--cv-primario)); box-shadow: 0 2px 12px rgba(14,47,110,.25); }
 .cv-navbar .navbar-brand { font-weight: 700; letter-spacing: -.02em; }
-.cv-navbar .nav-link { color: rgba(255,255,255,.8); border-radius: .5rem; padding: .45rem .8rem !important; }
+.cv-navbar .nav-link { color: rgba(255,255,255,.8); border-radius: .5rem; padding: .45rem .65rem !important; white-space: nowrap; font-size: .95rem; }
 .cv-navbar .nav-link:hover, .cv-navbar .nav-link.active { color: #fff; background: rgba(255,255,255,.14); }
 .cv-logo { width: 34px; height: 34px; border-radius: 10px; background: var(--cv-acento);
   display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 1.1rem; }
 .cv-avatar { width: 36px; height: 36px; border-radius: 50%; background: #fff; color: var(--cv-primario);
   display: inline-flex; align-items: center; justify-content: center; font-weight: 700; font-size: .85rem; }
+img.cv-avatar { background: transparent; object-fit: cover; }
 .cv-avatar-lg { width: 64px; height: 64px; font-size: 1.4rem; background: var(--cv-primario); color: #fff; }
 
 /* Encabezado de página */

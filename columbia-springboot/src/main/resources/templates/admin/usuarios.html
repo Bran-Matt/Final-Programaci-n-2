@@ -21,7 +21,7 @@
                 <tr th:each="u : ${usuarios}">
                     <td>
                         <div class="d-flex align-items-center gap-2">
-                            <span class="cv-avatar" style="background:#e6edfb" th:text="${u.iniciales}"></span>
+                            <img class="cv-avatar" th:attr="data-blobatar=${u.codigo}" alt="">
                             <span class="fw-semibold" th:text="${u.nombreCompleto}"></span>
                         </div>
                     </td>

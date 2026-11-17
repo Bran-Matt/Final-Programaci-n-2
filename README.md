@@ -93,6 +93,7 @@ Si tenés MySQL (por ejemplo el de XAMPP, con MySQL iniciado desde el panel de c
 - **Spring Data JPA / Hibernate**: persistencia en base de datos.
 - **Thymeleaf**: plantillas HTML del lado del servidor.
 - **Bootstrap 5** + Bootstrap Icons: diseño de las pantallas.
+- **blobatar** (licencia MIT): avatares de los usuarios, generados a partir de su código. Está copiado en `static/js/blobatar/` junto con su archivo `LICENSE`.
 - **H2** (por defecto) o **MySQL**.
 
 ## Diseño orientado a objetos

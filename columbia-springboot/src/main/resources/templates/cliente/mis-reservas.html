@@ -15,7 +15,7 @@
         <div class="col-lg-4">
             <div class="cv-card p-4">
                 <div class="d-flex align-items-center gap-3 mb-3">
-                    <span class="cv-avatar cv-avatar-lg" th:text="${cliente.iniciales}"></span>
+                    <img class="cv-avatar cv-avatar-lg" th:attr="data-blobatar=${cliente.codigo}" th:alt="${cliente.nombreCompleto}">
                     <div>
                         <h5 class="fw-bold m-0" th:text="${cliente.nombreCompleto}"></h5>
                         <small class="text-suave">Código de turista: <b th:text="${cliente.codigo}"></b></small>
