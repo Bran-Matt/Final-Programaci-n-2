@@ -1,69 +1,136 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Ingresar')}"></head>
-<body>
-<div class="cv-portada">
-    <section class="cv-hero">
-        <i class="bi bi-airplane-fill avion"></i>
-        <div class="d-flex align-items-center gap-2 fs-5 fw-bold">
+<body class="cv-entrada-body">
+<main class="cv-entrada">
+
+    <!-- Lado izquierdo: la "terminal" con la ruta y el tablero de salidas reales -->
+    <section class="cv-terminal" aria-label="Columbia Viajes">
+        <div class="cv-terminal-marca">
             <span class="cv-logo"><i class="bi bi-globe-americas"></i></span> Columbia Viajes
         </div>
-        <div class="my-5" style="position: relative">
-            <h1>Tu próximo viaje<br>empieza acá.</h1>
-            <p class="lead mt-3">Vuelos y hoteles exclusivos de la cadena, gestionados desde cualquiera de nuestras sucursales.</p>
-            <div class="destinos mt-4">
-                <span><i class="bi bi-geo-alt me-1"></i>Bariloche</span>
-                <span><i class="bi bi-geo-alt me-1"></i>Iguazú</span>
-                <span><i class="bi bi-geo-alt me-1"></i>Mendoza</span>
-                <span><i class="bi bi-geo-alt me-1"></i>Mar del Plata</span>
-            </div>
+
+        <div class="cv-terminal-cuerpo">
+            <h1 class="cv-titular">
+                <span class="cv-linea">Tu próximo viaje</span>
+                <span class="cv-linea">empieza <em>acá.</em></span>
+            </h1>
+            <p class="cv-bajada cv-linea">Vuelos y hoteles de la cadena, reservados desde cualquiera de nuestras sucursales.</p>
+
+            <!-- Ruta: Buenos Aires hacia el destino del próximo vuelo -->
+            <svg class="cv-ruta" viewBox="0 0 520 170" role="img"
+                 th:with="destino=${salidas.isEmpty() ? 'Bariloche' : salidas[0].destino}"
+                 th:attr="aria-label='Ruta de Buenos Aires a ' + ${destino}">
+                <path id="cv-ruta-camino" class="cv-ruta-camino" d="M36 140 C 150 10, 360 0, 484 70"/>
+                <path class="cv-ruta-punteado" d="M36 140 C 150 10, 360 0, 484 70"/>
+                <circle class="cv-ruta-punto" cx="36" cy="140" r="5"/>
+                <circle class="cv-ruta-punto destino" cx="484" cy="70" r="5"/>
+                <circle class="cv-ruta-pulso" cx="484" cy="70" r="5"/>
+                <text class="cv-ruta-codigo" x="22" y="166">Buenos Aires</text>
+                <text class="cv-ruta-codigo" x="500" y="98" text-anchor="end" th:text="${destino}">Bariloche</text>
+                <g class="cv-avion" transform="translate(36 140) rotate(50)">
+                    <path transform="translate(-12 -12) scale(1.5)" d="M6.428 1.151C6.708.591 7.213 0 8 0s1.292.592 1.572 1.151C9.861 1.73 10 2.431 10 3v3.691l5.17 2.585a1.5 1.5 0 0 1 .83 1.342V12a.5.5 0 0 1-.582.493l-5.507-.918-.375 2.253 1.318 1.318A.5.5 0 0 1 10.5 16h-5a.5.5 0 0 1-.354-.854l1.319-1.318-.376-2.253-5.507.918A.5.5 0 0 1 0 12v-1.382a1.5 1.5 0 0 1 .83-1.342L6 6.691V3c0-.568.14-1.271.428-1.849"/>
+                </g>
+            </svg>
         </div>
-        <small class="opacity-75">www.columbiaviajes.com.ar</small>
+
+        <div class="cv-tablero">
+            <div class="cv-tablero-titulo">
+                <span><i class="bi bi-airplane-engines"></i> Próximas salidas</span>
+                <span class="cv-reloj" id="reloj">--:--</span>
+            </div>
+            <table>
+                <thead>
+                <tr><th>Salida</th><th>Vuelo</th><th>Destino</th><th class="text-end">Lugares</th></tr>
+                </thead>
+                <tbody>
+                <tr th:each="v, it : ${salidas}" th:if="${it.index < 4}" class="cv-tablero-fila">
+                    <td th:text="${#temporals.format(v.fechaHora, 'dd/MM HH:mm')}">20/11 08:30</td>
+                    <td th:text="${v.numero}">CV101</td>
+                    <td th:text="${v.destino}">Bariloche</td>
+                    <td class="text-end"
+                        th:with="libres=${@reservaService.plazasLibres(v,'TURISTA') + @reservaService.plazasLibres(v,'PRIMERA')}"
+                        th:text="${libres}" th:classappend="${libres < 10} ? 'pocos'">42</td>
+                </tr>
+                <tr th:if="${salidas.isEmpty()}"><td colspan="4" class="vacio">No hay salidas programadas.</td></tr>
+                </tbody>
+            </table>
+        </div>
     </section>
 
-    <section class="cv-login">
-        <form th:action="@{/login}" method="post">
-            <h2 class="fw-bold mb-1">Ingresar</h2>
-            <p class="text-suave mb-4">Usá tu código de usuario y tu clave.</p>
+    <!-- Lado derecho: el formulario con forma de pasaje -->
+    <section class="cv-acceso">
+        <form class="cv-pasaje" th:action="@{/login}" method="post" novalidate
+              th:attr="data-error=${error != null}">
+            <div class="cv-pasaje-cuerpo">
+                <h2>Ingresar</h2>
+                <p class="cv-pasaje-ayuda">Usá tu código de usuario y tu clave.</p>
 
-            <div th:if="${error}" class="alert alert-danger border-0 py-2 d-flex align-items-center gap-2">
-                <i class="bi bi-exclamation-circle"></i><span th:text="${error}"></span>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label" for="codigo">Código de usuario</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-white"><i class="bi bi-person"></i></span>
-                    <input class="form-control" id="codigo" name="codigo" th:value="${codigo}" required autofocus placeholder="ej: cliente1">
+                <div class="cv-campo-grupo" id="campos">
+                    <div class="cv-campo">
+                        <label for="codigo">Código de usuario</label>
+                        <div class="cv-control">
+                            <i class="bi bi-person" aria-hidden="true"></i>
+                            <input id="codigo" name="codigo" th:value="${codigo}" required
+                                   autocomplete="username" autocapitalize="none" spellcheck="false"
+                                   placeholder="ej: cliente1">
+                        </div>
+                    </div>
+                    <div class="cv-campo">
+                        <label for="clave">Clave</label>
+                        <div class="cv-control">
+                            <i class="bi bi-lock" aria-hidden="true"></i>
+                            <input id="clave" name="clave" type="password" required
+                                   autocomplete="current-password" placeholder="Tu clave">
+                            <button type="button" class="cv-ojo" id="ver-clave" aria-label="Mostrar clave" aria-pressed="false">
+                                <i class="bi bi-eye" aria-hidden="true"></i>
+                                <i class="bi bi-eye-slash" aria-hidden="true"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="cv-error" id="error" role="alert" aria-live="assertive">
+                        <i class="bi bi-exclamation-circle" aria-hidden="true"></i>
+                        <span th:text="${error ?: 'Completá el código y la clave.'}">Código o clave incorrectos</span>
+                    </p>
                 </div>
-            </div>
-            <div class="mb-4">
-                <label class="form-label" for="clave">Clave</label>
-                <div class="input-group">
-                    <span class="input-group-text bg-white"><i class="bi bi-lock"></i></span>
-                    <input class="form-control" id="clave" name="clave" type="password" required placeholder="••••">
-                </div>
-            </div>
-            <button class="btn btn-primary w-100 py-2" type="submit">Ingresar <i class="bi bi-arrow-right ms-1"></i></button>
 
-            <div class="mt-5">
-                <p class="small text-suave mb-2"><i class="bi bi-info-circle me-1"></i>Usuarios de prueba (clave <b>1234</b>). Tocá uno para completar:</p>
-                <div class="cv-demo d-grid gap-2" style="grid-template-columns: 1fr 1fr">
-                    <button type="button" class="btn btn-light btn-sm" data-codigo="cliente1"><i class="bi bi-person me-1"></i>Cliente</button>
-                    <button type="button" class="btn btn-light btn-sm" data-codigo="vendedor1"><i class="bi bi-briefcase me-1"></i>Vendedor</button>
-                    <button type="button" class="btn btn-light btn-sm" data-codigo="admin"><i class="bi bi-shield-lock me-1"></i>Administrador</button>
-                    <button type="button" class="btn btn-light btn-sm" data-codigo="duenio"><i class="bi bi-gem me-1"></i>Dueño</button>
+                <button class="cv-embarcar" type="submit" id="embarcar">
+                    <span class="cv-embarcar-texto">Ingresar</span>
+                    <span class="cv-embarcar-cargando" aria-hidden="true"><span class="spinner-border spinner-border-sm"></span> Ingresando…</span>
+                    <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                </button>
+            </div>
+
+            <!-- Talón del pasaje: usuarios de prueba -->
+            <div class="cv-talon">
+                <p>Usuarios de prueba, clave <b>1234</b>. Tocá uno para completar.</p>
+                <div class="cv-demo">
+                    <button type="button" data-codigo="cliente1">
+                        <img alt="" data-blobatar="cliente1"><span>Cliente</span>
+                    </button>
+                    <button type="button" data-codigo="vendedor1">
+                        <img alt="" data-blobatar="vendedor1"><span>Vendedor</span>
+                    </button>
+                    <button type="button" data-codigo="admin">
+                        <img alt="" data-blobatar="admin"><span>Admin</span>
+                    </button>
+                    <button type="button" data-codigo="duenio">
+                        <img alt="" data-blobatar="duenio"><span>Dueño</span>
+                    </button>
                 </div>
             </div>
         </form>
     </section>
-</div>
-<script>
-    document.querySelectorAll('.cv-demo button').forEach(function (b) {
-        b.addEventListener('click', function () {
-            document.getElementById('codigo').value = b.dataset.codigo;
-            document.getElementById('clave').value = '1234';
-        });
+</main>
+
+<!-- GSAP: animación de entrada (gratis, sin atribución) -->
+<script th:src="@{/webjars/gsap/3.12.7/dist/gsap.min.js}"></script>
+<script th:src="@{/webjars/gsap/3.12.7/dist/MotionPathPlugin.min.js}"></script>
+<script th:src="@{/js/entrada.js}"></script>
+<script type="module" th:inline="none">
+    import { blobatarUri } from '/js/blobatar/uri.js';
+    document.querySelectorAll('img[data-blobatar]').forEach(function (img) {
+        img.src = blobatarUri(img.dataset.blobatar);
     });
 </script>
 </body>

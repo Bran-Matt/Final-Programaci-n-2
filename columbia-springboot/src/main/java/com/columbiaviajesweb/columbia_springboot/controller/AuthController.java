@@ -4,6 +4,7 @@ import com.columbiaviajesweb.columbia_springboot.config.SesionInterceptor;
 import com.columbiaviajesweb.columbia_springboot.entity.Usuario;
 import com.columbiaviajesweb.columbia_springboot.repository.UsuarioRepository;
 import com.columbiaviajesweb.columbia_springboot.service.UsuarioService;
+import com.columbiaviajesweb.columbia_springboot.service.VueloService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,10 +20,19 @@ public class AuthController {
 
     private final UsuarioService usuarioService;
     private final UsuarioRepository usuarioRepository;
+    private final VueloService vueloService;
 
-    public AuthController(UsuarioService usuarioService, UsuarioRepository usuarioRepository) {
+    public AuthController(UsuarioService usuarioService, UsuarioRepository usuarioRepository,
+                          VueloService vueloService) {
         this.usuarioService = usuarioService;
         this.usuarioRepository = usuarioRepository;
+        this.vueloService = vueloService;
+    }
+
+    /** El tablero de la portada muestra los próximos vuelos reales de la base. */
+    @ModelAttribute("salidas")
+    public java.util.List<com.columbiaviajesweb.columbia_springboot.entity.Vuelo> salidas() {
+        return vueloService.proximos();
     }
 
     @GetMapping("/")
