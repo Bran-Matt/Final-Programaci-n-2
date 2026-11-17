@@ -34,4 +34,27 @@
             requestAnimationFrame(function () { barra.style.width = barra.dataset.ancho + '%'; });
         });
     });
+
+    // 3. Tarjetas con role="button": también se abren con Enter o Espacio
+    document.querySelectorAll('[role="button"][data-bs-toggle]').forEach(function (el) {
+        el.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); el.click(); }
+        });
+    });
+
+    // 4. Entrada de la página con GSAP: corta y sutil, porque se repite en cada pantalla
+    if (window.gsap && !reducido) {
+        var main = document.querySelector('main');
+        var encabezado = main && main.querySelector('.cv-encabezado');
+        if (encabezado) {
+            var textos = encabezado.querySelectorAll('h1, p, .cv-icono, .btn');
+            var bloques = Array.prototype.filter.call(
+                main.querySelectorAll('.cv-encabezado ~ .row > [class*="col"], .cv-encabezado ~ .cv-card, .cv-encabezado ~ form, .col-lg-8 .d-grid > .cv-card'),
+                function (el) { return el.getBoundingClientRect().top < window.innerHeight; }
+            ).slice(0, 12);
+            var tl = gsap.timeline({ defaults: { ease: 'expo.out' } });
+            tl.from(textos, { autoAlpha: 0, y: 8, filter: 'blur(3px)', duration: 0.5, stagger: 0.04, clearProps: 'filter,transform,visibility,opacity' })
+              .from(bloques, { autoAlpha: 0, y: 14, duration: 0.6, stagger: 0.04, clearProps: 'transform,visibility,opacity' }, '<0.08');
+        }
+    }
 })();
