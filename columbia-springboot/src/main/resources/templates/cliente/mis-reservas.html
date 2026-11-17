@@ -34,7 +34,7 @@
                 </div>
                 <div class="border-top mt-3 pt-3 d-flex justify-content-between">
                     <span class="text-suave">Total de tus reservas</span>
-                    <span class="fw-bold" th:text="'$ ' + ${#numbers.formatDecimal(cliente.totalGastado, 1, 'POINT', 0, 'COMMA')}"></span>
+                    <span class="fw-bold" th:attr="data-contar=${cliente.totalGastado}" data-prefijo="$ " th:text="'$ ' + ${#numbers.formatDecimal(cliente.totalGastado, 1, 'POINT', 0, 'COMMA')}"></span>
                 </div>
             </div>
         </div>
@@ -43,7 +43,7 @@
                 <i class="bi bi-suitcase2"></i>Todavía no tenés reservas. Acercate a tu sucursal para armar tu viaje.
             </div>
             <div class="d-grid gap-3">
-                <div th:each="r : ${cliente.reservas}" class="cv-card cv-ticket p-4" th:classappend="${r.tipo == 'Hotel'} ? 'hotel'">
+                <div th:each="r : ${cliente.reservas}" class="cv-card cv-card-hover cv-ticket cv-clickeable p-4" th:classappend="${r.tipo == 'Hotel'} ? 'hotel'" role="button" tabindex="0" data-bs-toggle="offcanvas" th:attr="data-bs-target='#reserva-' + ${r.id}">
                     <div class="d-flex justify-content-between align-items-start gap-3">
                         <div class="d-flex gap-3">
                             <span class="cv-icono" th:classappend="${r.tipo == 'Vuelo'} ? 'azul' : 'naranja'"><i class="bi" th:classappend="${r.icono}"></i></span>
@@ -62,6 +62,7 @@
             </div>
         </div>
     </div>
+    <th:block th:each="r : ${cliente.reservas}"><div th:replace="~{fragments/reserva-detalle :: detalle(${r})}"></div></th:block>
 </main>
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>

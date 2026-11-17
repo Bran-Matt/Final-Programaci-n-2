@@ -70,14 +70,23 @@
 </nav>
 
 <!-- Mensajes de éxito / error -->
-<div th:fragment="mensajes">
-    <div th:if="${exito}" class="alert alert-success border-0 shadow-sm d-flex align-items-center gap-2 alert-dismissible fade show">
-        <i class="bi bi-check-circle-fill"></i><span th:text="${exito}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+<!-- Mensajes de éxito / error: notificaciones en la esquina que se van solas -->
+<div th:fragment="mensajes" class="cv-toasts">
+    <div th:if="${exito}" class="toast cv-toast exito" role="status" data-bs-delay="4500">
+        <div class="d-flex align-items-center gap-3 p-3">
+            <span class="cv-toast-icono"><i class="bi bi-check-lg"></i></span>
+            <div class="flex-grow-1"><div class="fw-semibold">Listo</div><div class="small text-suave" th:text="${exito}"></div></div>
+            <button type="button" class="btn-close btn-sm" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+        <div class="cv-toast-barra"></div>
     </div>
-    <div th:if="${error}" class="alert alert-danger border-0 shadow-sm d-flex align-items-center gap-2 alert-dismissible fade show">
-        <i class="bi bi-exclamation-triangle-fill"></i><span th:text="${error}"></span>
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    <div th:if="${error}" class="toast cv-toast error" role="alert" data-bs-delay="8000">
+        <div class="d-flex align-items-center gap-3 p-3">
+            <span class="cv-toast-icono"><i class="bi bi-exclamation-lg"></i></span>
+            <div class="flex-grow-1"><div class="fw-semibold">No se pudo completar</div><div class="small text-suave" th:text="${error}"></div></div>
+            <button type="button" class="btn-close btn-sm" data-bs-dismiss="toast" aria-label="Cerrar"></button>
+        </div>
+        <div class="cv-toast-barra"></div>
     </div>
 </div>
 
@@ -87,6 +96,7 @@
         <span>Spring Boot · Thymeleaf · Hibernate · Bootstrap</span>
     </div>
     <script th:src="@{/webjars/bootstrap/5.3.3/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/js/app.js}"></script>
     <!-- Avatares generados a partir del código de cada usuario (blobatar, licencia MIT) -->
     <script type="module" th:inline="none">
         import { blobatarUri } from '/js/blobatar/uri.js';

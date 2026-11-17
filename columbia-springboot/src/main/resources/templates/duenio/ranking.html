@@ -14,11 +14,11 @@
     <div class="row g-3 mb-4">
         <div class="col-md-4">
             <div class="cv-card cv-stat"><span class="cv-icono verde"><i class="bi bi-cash-stack"></i></span>
-                <div><div class="valor" th:text="'$ ' + ${#numbers.formatDecimal(total, 1, 'POINT', 0, 'COMMA')}"></div><div class="etiqueta">Facturación total</div></div></div>
+                <div><div class="valor" th:attr="data-contar=${total}" data-prefijo="$ " th:text="'$ ' + ${#numbers.formatDecimal(total, 1, 'POINT', 0, 'COMMA')}"></div><div class="etiqueta">Facturación total</div></div></div>
         </div>
         <div class="col-md-4">
             <div class="cv-card cv-stat"><span class="cv-icono azul"><i class="bi bi-ticket-perforated"></i></span>
-                <div><div class="valor" th:text="${reservas}"></div><div class="etiqueta">Reservas vendidas</div></div></div>
+                <div><div class="valor" th:attr="data-contar=${reservas}" th:text="${reservas}"></div><div class="etiqueta">Reservas vendidas</div></div></div>
         </div>
         <div class="col-md-4">
             <div class="cv-card cv-stat"><span class="cv-icono violeta"><i class="bi bi-trophy"></i></span>
@@ -42,9 +42,9 @@
                     <td class="text-center fw-semibold" th:text="${f.reservas()}"></td>
                     <td>
                         <div class="d-flex justify-content-between small mb-1">
-                            <span class="fw-bold" th:text="'$ ' + ${#numbers.formatDecimal(f.facturado(), 1, 'POINT', 0, 'COMMA')}"></span>
+                            <span class="fw-bold" th:attr="data-contar=${f.facturado()}" data-prefijo="$ " th:text="'$ ' + ${#numbers.formatDecimal(f.facturado(), 1, 'POINT', 0, 'COMMA')}"></span>
                         </div>
-                        <div class="progress"><div class="progress-bar" th:style="'width:' + ${f.porcentaje()} + '%'"></div></div>
+                        <div class="progress"><div class="progress-bar" th:attr="data-ancho=${f.porcentaje()}"></div></div>
                     </td>
                 </tr>
                 </tbody>

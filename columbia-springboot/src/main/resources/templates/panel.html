@@ -19,11 +19,11 @@
     <div class="row g-3 mb-4">
         <div class="col-6 col-lg-3">
             <div class="cv-card cv-stat"><span class="cv-icono azul"><i class="bi bi-ticket-perforated"></i></span>
-                <div><div class="valor" th:text="${totalReservas}">0</div><div class="etiqueta">Reservas</div></div></div>
+                <div><div class="valor" th:attr="data-contar=${totalReservas}" th:text="${totalReservas}">0</div><div class="etiqueta">Reservas</div></div></div>
         </div>
         <div class="col-6 col-lg-3">
             <div class="cv-card cv-stat"><span class="cv-icono naranja"><i class="bi bi-people"></i></span>
-                <div><div class="valor" th:text="${totalClientes}">0</div><div class="etiqueta">Clientes</div></div></div>
+                <div><div class="valor" th:attr="data-contar=${totalClientes}" th:text="${totalClientes}">0</div><div class="etiqueta">Clientes</div></div></div>
         </div>
         <div class="col-6 col-lg-3">
             <div class="cv-card cv-stat"><span class="cv-icono violeta"><i class="bi bi-airplane"></i></span>
@@ -31,7 +31,7 @@
         </div>
         <div class="col-6 col-lg-3">
             <div class="cv-card cv-stat"><span class="cv-icono verde"><i class="bi bi-cash-stack"></i></span>
-                <div><div class="valor" th:text="'$ ' + ${#numbers.formatDecimal(facturacion, 1, 'POINT', 0, 'COMMA')}">$ 0</div><div class="etiqueta">Facturación total</div></div></div>
+                <div><div class="valor" th:attr="data-contar=${facturacion}" data-prefijo="$ " th:text="'$ ' + ${#numbers.formatDecimal(facturacion, 1, 'POINT', 0, 'COMMA')}">$ 0</div><div class="etiqueta">Facturación total</div></div></div>
         </div>
     </div>
 
@@ -44,14 +44,14 @@
                 </div>
                 <div th:if="${ultimasReservas.isEmpty()}" class="cv-vacio"><i class="bi bi-inbox"></i>Todavía no hay reservas</div>
                 <div class="list-group list-group-flush">
-                    <div th:each="r : ${ultimasReservas}" class="list-group-item px-4 py-3 d-flex align-items-center gap-3">
+                    <a href="#" th:each="r : ${ultimasReservas}" class="list-group-item list-group-item-action px-4 py-3 d-flex align-items-center gap-3" data-bs-toggle="offcanvas" th:attr="data-bs-target='#reserva-' + ${r.id}">
                         <span class="cv-icono" th:classappend="${r.tipo == 'Vuelo'} ? 'azul' : 'naranja'"><i class="bi" th:classappend="${r.icono}"></i></span>
                         <div class="flex-grow-1">
                             <div class="fw-semibold" th:text="${r.cliente.nombreCompleto}">Cliente</div>
                             <small class="text-suave" th:text="${r.descripcion}">desc</small>
                         </div>
                         <span class="fw-semibold" th:text="'$ ' + ${#numbers.formatDecimal(r.importe, 1, 'POINT', 0, 'COMMA')}">$</span>
-                    </div>
+                    </a>
                 </div>
             </div>
         </div>
@@ -75,6 +75,7 @@
             </div>
         </div>
     </div>
+    <th:block th:each="r : ${ultimasReservas}"><div th:replace="~{fragments/reserva-detalle :: detalle(${r})}"></div></th:block>
 </main>
 <footer th:replace="~{fragments/layout :: footer}"></footer>
 </body>

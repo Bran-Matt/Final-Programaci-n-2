@@ -113,3 +113,36 @@ img.cv-avatar { background: transparent; object-fit: cover; }
 footer.cv-footer { color: var(--cv-texto-suave); font-size: .85rem; padding: 2rem 0; }
 .text-suave { color: var(--cv-texto-suave) !important; }
 .fw-semibold { font-weight: 600; }
+
+/* Notificaciones en la esquina */
+.cv-toasts { position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 1090; display: grid; gap: .75rem; width: min(380px, calc(100vw - 2.5rem)); }
+.cv-toast { width: 100%; border: 1px solid #e7eaf3; border-radius: 1rem; background: #fff; box-shadow: 0 16px 40px rgba(16,24,40,.16); overflow: hidden; }
+.cv-toast.showing, .cv-toast.show { animation: cv-entrar .45s cubic-bezier(.2,1.3,.4,1); }
+.cv-toast-icono { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; color: #fff; font-size: 1.1rem; flex-shrink: 0; }
+.cv-toast.exito .cv-toast-icono { background: #16a34a; }
+.cv-toast.error .cv-toast-icono { background: #dc2626; }
+.cv-toast-barra { height: 3px; transform-origin: left; animation: cv-tiempo linear forwards; }
+.cv-toast.exito .cv-toast-barra { background: #16a34a; }
+.cv-toast.error .cv-toast-barra { background: #dc2626; }
+@keyframes cv-entrar { from { opacity: 0; transform: translateY(24px) scale(.96); } to { opacity: 1; transform: none; } }
+@keyframes cv-tiempo { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+
+/* Barras que crecen */
+.progress-bar[data-ancho] { width: 0; transition: width 1.1s cubic-bezier(.2,.8,.2,1); }
+
+/* Panel lateral con el detalle de una reserva */
+.cv-detalle { width: min(440px, 100vw) !important; border-left: none; box-shadow: -20px 0 50px rgba(16,24,40,.18); }
+.cv-detalle .offcanvas-header { padding: 1.5rem; color: #fff; align-items: flex-start; }
+.cv-detalle.vuelo .offcanvas-header { background: linear-gradient(135deg, var(--cv-primario-oscuro), var(--cv-primario)); }
+.cv-detalle.hotel .offcanvas-header { background: linear-gradient(135deg, #e8572f, var(--cv-acento)); }
+.cv-detalle .offcanvas-body { padding: 1.5rem; }
+.cv-detalle dl { display: grid; grid-template-columns: auto 1fr; gap: .55rem 1rem; margin: 0; font-size: .92rem; }
+.cv-detalle dt { color: var(--cv-texto-suave); font-weight: 500; }
+.cv-detalle dd { margin: 0; text-align: right; font-weight: 600; }
+.cv-detalle .seccion { border: 1px solid #e7eaf3; border-radius: .9rem; padding: 1rem; margin-bottom: 1rem; }
+.cv-detalle .seccion h6 { font-size: .75rem; text-transform: uppercase; letter-spacing: .05em; color: var(--cv-texto-suave); margin-bottom: .8rem; }
+.cv-clickeable { cursor: pointer; }
+@media (prefers-reduced-motion: reduce) {
+  .cv-toast.showing, .cv-toast.show, .cv-toast-barra { animation: none; }
+  .progress-bar[data-ancho] { transition: none; }
+}
