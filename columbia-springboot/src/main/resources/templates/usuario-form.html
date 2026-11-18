@@ -30,7 +30,7 @@
                 <select class="form-select" th:field="*{rol}" id="rol" onchange="mostrarSucursal()">
                     <option th:each="r : ${roles}" th:value="${r}" th:text="${r.etiqueta}">Cliente</option>
                 </select>
-                <small class="text-suave">Solo se puede cambiar si el usuario no tiene reservas ni ventas.</small>
+                <small class="text-suave">Un cliente con reservas no puede cambiar de rol. Si un vendedor tenía ventas, esas reservas quedan sin vendedor.</small>
             </div>
         </div>
         <input th:unless="${rolEditable}" type="hidden" th:field="*{rol}">

@@ -5,6 +5,7 @@ import com.columbiaviajesweb.columbia_springboot.dto.UsuarioForm;
 import com.columbiaviajesweb.columbia_springboot.entity.*;
 import com.columbiaviajesweb.columbia_springboot.exception.ReglaNegocioException;
 import com.columbiaviajesweb.columbia_springboot.repository.ClienteRepository;
+import com.columbiaviajesweb.columbia_springboot.repository.ReservaRepository;
 import com.columbiaviajesweb.columbia_springboot.repository.UsuarioRepository;
 import com.columbiaviajesweb.columbia_springboot.repository.VendedorRepository;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -29,11 +30,14 @@ public class UsuarioService extends ServicioBase<Usuario> {
     private final ClienteRepository clienteRepo;
     private final VendedorRepository vendedorRepo;
     private final SucursalService sucursalService;
+    private final ReservaRepository reservaRepo;
     private final PasswordEncoder encoder = new BCryptPasswordEncoder();
 
     public UsuarioService(UsuarioRepository repo, ClienteRepository clienteRepo,
-                          VendedorRepository vendedorRepo, SucursalService sucursalService) {
+                          VendedorRepository vendedorRepo, SucursalService sucursalService,
+                          ReservaRepository reservaRepo) {
         this.repo = repo;
+        this.reservaRepo = reservaRepo;
         this.clienteRepo = clienteRepo;
         this.vendedorRepo = vendedorRepo;
         this.sucursalService = sucursalService;
@@ -114,8 +118,8 @@ public class UsuarioService extends ServicioBase<Usuario> {
     /**
      * Cambia el rol de un usuario. Como cada rol es una subclase distinta (herencia JOINED),
      * no alcanza con cambiar un campo: se crea un usuario del nuevo tipo con los mismos datos
-     * y se borra el anterior. Solo se permite si no tiene reservas asociadas, para no perder
-     * el historial de ventas ni los viajes de un cliente.
+     * y se borra el anterior. A un cliente con reservas no se lo puede cambiar (los viajes son suyos);
+     * si un vendedor tenía ventas, las reservas siguen existiendo pero quedan sin vendedor.
      */
     private Usuario cambiarRol(Usuario anterior, Rol nuevoRol, Usuario actual) {
         if (actual != null && anterior.getId().equals(actual.getId())) {
@@ -126,8 +130,8 @@ public class UsuarioService extends ServicioBase<Usuario> {
                     + c.getReservas().size() + " reserva(s). Eliminalas primero.");
         }
         if (anterior instanceof Vendedor v && !v.getReservas().isEmpty()) {
-            throw new ReglaNegocioException("No se puede cambiar el rol: el vendedor tiene "
-                    + v.getReservas().size() + " venta(s) registradas.");
+            reservaRepo.quitarVendedor(v);
+            anterior = buscar(v.getId()); // se vuelve a leer: la actualización limpió la sesión de JPA
         }
         Usuario nuevo = nuevoRol.crearUsuario();
         nuevo.setClave(anterior.getClave()); // conserva la clave si no se escribe una nueva

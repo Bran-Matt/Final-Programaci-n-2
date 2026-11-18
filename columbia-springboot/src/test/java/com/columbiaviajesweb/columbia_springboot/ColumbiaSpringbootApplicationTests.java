@@ -59,6 +59,15 @@ class ColumbiaSpringbootApplicationTests {
         conReservas.setRol(Rol.VENDEDOR);
         assertThrows(ReglaNegocioException.class, () -> usuarioService.guardar(conReservas, null));
 
+        // Un vendedor con ventas pasa a administrador; sus reservas quedan sin vendedor
+        double facturacionAntes = reservaService.facturacionTotal();
+        Usuario vendedor = usuarioService.autenticar("vendedor3", "1234").orElseThrow();
+        UsuarioForm ascenso = UsuarioForm.desde(vendedor);
+        ascenso.setRol(Rol.ADMINISTRADOR);
+        assertInstanceOf(Administrador.class, usuarioService.guardar(ascenso, null));
+        assertInstanceOf(Administrador.class, usuarioService.autenticar("vendedor3", "1234").orElseThrow());
+        assertEquals(facturacionAntes, reservaService.facturacionTotal(), 0.01);
+
         // Nadie puede cambiar su propio rol
         UsuarioForm propio = UsuarioForm.desde(cambiado);
         propio.setRol(Rol.CLIENTE);

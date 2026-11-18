@@ -2,6 +2,7 @@ package com.columbiaviajesweb.columbia_springboot.repository;
 
 import com.columbiaviajesweb.columbia_springboot.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -11,6 +12,11 @@ import java.util.List;
 public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     List<Reserva> findAllByOrderByFechaReservaDesc();
+
+    /** Deja sin vendedor las ventas de un vendedor (sin recalcular importes). */
+    @Modifying(flushAutomatically = true, clearAutomatically = true)
+    @Query("update Reserva r set r.vendedor = null where r.vendedor = :vendedor")
+    int quitarVendedor(@Param("vendedor") Vendedor vendedor);
 
     List<Reserva> findTop5ByOrderByFechaReservaDesc();
 
