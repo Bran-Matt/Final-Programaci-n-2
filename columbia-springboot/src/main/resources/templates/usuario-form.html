@@ -26,8 +26,8 @@
                     </label>
                 </div>
             </div>
-            <div th:unless="*{id == null}" style="max-width: 320px">
-                <select class="form-select" th:field="*{rol}" id="rol" onchange="mostrarSucursal()">
+            <div th:unless="*{id == null}" class="d-flex flex-wrap flex-md-nowrap align-items-center gap-2 gap-md-3">
+                <select class="form-select flex-shrink-0" style="max-width: 280px" th:field="*{rol}" id="rol" onchange="mostrarSucursal()">
                     <option th:each="r : ${roles}" th:value="${r}" th:text="${r.etiqueta}">Cliente</option>
                 </select>
                 <small class="text-suave">Un cliente con reservas no puede cambiar de rol. Si un vendedor tenía ventas, esas reservas quedan sin vendedor.</small>
