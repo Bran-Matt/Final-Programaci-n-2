@@ -129,3 +129,38 @@ columbia-springboot/src/main/java/.../columbia_springboot/
 ```
 
 Los tests (`./mvnw test`) prueban el login, los permisos por rol, el cálculo de importes, el orden del ranking y que no se pueda sobrevender un vuelo.
+
+---
+
+## Paso a Paso
+
+Guía completa para instalar y correr el proyecto en otra computadora (Windows): **[PASOS.md](PASOS.md)**.
+
+### Qué instalar
+
+- **Git**: https://git-scm.com/download/win
+- **JDK 21**: https://adoptium.net/temurin/releases/?version=21 (al instalar, marcá *Add to PATH* y *Set JAVA_HOME variable*)
+- **VS Code** + **Extension Pack for Java** (opcional, para ver el código)
+
+No hace falta instalar Maven (viene `mvnw.cmd`) ni MySQL/XAMPP (la base H2 viene adentro y se crea sola).
+
+### Cómo instalarlo y correrlo
+
+```
+git clone https://github.com/bran-matt/final-programaci-n-2.git
+cd final-programaci-n-2\columbia-springboot
+.\mvnw.cmd spring-boot:run
+```
+
+1. La primera vez tarda unos minutos (descarga Maven y las librerías).
+2. Esperá la línea `Started ColumbiaSpringbootApplication`.
+3. Abrí **http://localhost:8080** y entrá con un usuario de prueba (`cliente1`, `vendedor1`, `admin` o `duenio`, clave `1234`).
+4. Para apagarla: **Ctrl + C** en la terminal.
+
+### Si algo falla
+
+- **"java no se reconoce" / error de JAVA_HOME:** reinstalá el JDK 21 marcando *Add to PATH* y *Set JAVA_HOME*, y abrí una terminal nueva.
+- **"Port 8080 was already in use":** ya hay otra copia de la app abierta; cerrala con Ctrl + C y probá de nuevo.
+- **Empezar con la base limpia:** con la app apagada, borrá la carpeta `columbia-springboot\data`.
+
+Más detalles y otros problemas en [PASOS.md](PASOS.md).
