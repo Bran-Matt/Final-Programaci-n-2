@@ -73,6 +73,14 @@ public class UsuarioService extends ServicioBase<Usuario> {
      * Usa la fábrica del rol para instanciar la subclase correcta.
      */
     public Usuario guardar(UsuarioForm form) {
+        return guardar(form, null);
+    }
+
+    /**
+     * Igual que {@link #guardar(UsuarioForm)}, pero sabiendo quién edita.
+     * Si el rol cambió, el usuario pasa a ser de otra subclase (ver {@link #cambiarRol}).
+     */
+    public Usuario guardar(UsuarioForm form, Usuario actual) {
         if (repo.existsByCodigoIgnoreCaseAndIdNot(form.getCodigo().trim(), idONinguno(form.getId()))) {
             throw new ReglaNegocioException("Ya existe un usuario con el código " + form.getCodigo());
         }
@@ -85,7 +93,7 @@ public class UsuarioService extends ServicioBase<Usuario> {
         } else {
             u = buscar(form.getId());
             if (u.getRol() != form.getRol()) {
-                throw new ReglaNegocioException("No se puede cambiar el rol de un usuario existente");
+                u = cambiarRol(u, form.getRol(), actual);
             }
         }
         u.setCodigo(form.getCodigo().trim());
@@ -101,6 +109,31 @@ public class UsuarioService extends ServicioBase<Usuario> {
         if (u instanceof Cliente c) c.setSucursal(sucursal);
         if (u instanceof Vendedor v) v.setSucursal(sucursal);
         return repo.save(u);
+    }
+
+    /**
+     * Cambia el rol de un usuario. Como cada rol es una subclase distinta (herencia JOINED),
+     * no alcanza con cambiar un campo: se crea un usuario del nuevo tipo con los mismos datos
+     * y se borra el anterior. Solo se permite si no tiene reservas asociadas, para no perder
+     * el historial de ventas ni los viajes de un cliente.
+     */
+    private Usuario cambiarRol(Usuario anterior, Rol nuevoRol, Usuario actual) {
+        if (actual != null && anterior.getId().equals(actual.getId())) {
+            throw new ReglaNegocioException("No podés cambiar tu propio rol");
+        }
+        if (anterior instanceof Cliente c && !c.getReservas().isEmpty()) {
+            throw new ReglaNegocioException("No se puede cambiar el rol: el cliente tiene "
+                    + c.getReservas().size() + " reserva(s). Eliminalas primero.");
+        }
+        if (anterior instanceof Vendedor v && !v.getReservas().isEmpty()) {
+            throw new ReglaNegocioException("No se puede cambiar el rol: el vendedor tiene "
+                    + v.getReservas().size() + " venta(s) registradas.");
+        }
+        Usuario nuevo = nuevoRol.crearUsuario();
+        nuevo.setClave(anterior.getClave()); // conserva la clave si no se escribe una nueva
+        repo.delete(anterior);
+        repo.flush(); // libera el código antes de insertar el nuevo usuario
+        return nuevo;
     }
 
     /** Crea un usuario directamente (lo usa la carga inicial de datos). */

@@ -46,17 +46,18 @@ public class AdminUsuariosController {
 
     @PostMapping("/guardar")
     public String guardar(@Valid @ModelAttribute("form") UsuarioForm form, BindingResult errores,
+                          @RequestAttribute("usuarioActual") Usuario actual,
                           Model model, RedirectAttributes flash) {
         if (!errores.hasErrors()) {
             try {
-                usuarioService.guardar(form);
+                usuarioService.guardar(form, actual);
                 flash.addFlashAttribute("exito", "Usuario guardado correctamente");
                 return "redirect:/admin/usuarios";
             } catch (ReglaNegocioException e) {
                 model.addAttribute("error", e.getMessage());
             }
         }
-        return formulario(form, "Usuario", model);
+        return formulario(form, form.getId() == null ? "Nuevo usuario" : "Editar usuario", model);
     }
 
     @PostMapping("/{id}/eliminar")

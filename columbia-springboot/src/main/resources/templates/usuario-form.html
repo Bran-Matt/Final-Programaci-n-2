@@ -15,7 +15,7 @@
     <form class="cv-card p-4" th:action="@{${accion}}" th:object="${form}" method="post" novalidate>
         <input type="hidden" th:field="*{id}">
 
-        <!-- Rol: elegible solo al crear desde la administración de usuarios -->
+        <!-- Rol: tarjetas al crear, desplegable al editar (solo en la administración de usuarios) -->
         <div class="mb-4" th:if="${rolEditable}">
             <label class="form-label">Rol</label>
             <div th:if="*{id == null}" class="row g-2">
@@ -26,9 +26,11 @@
                     </label>
                 </div>
             </div>
-            <div th:unless="*{id == null}">
-                <input type="hidden" th:field="*{rol}">
-                <span class="badge badge-suave fs-6" th:text="*{rol.etiqueta}"></span>
+            <div th:unless="*{id == null}" style="max-width: 320px">
+                <select class="form-select" th:field="*{rol}" id="rol" onchange="mostrarSucursal()">
+                    <option th:each="r : ${roles}" th:value="${r}" th:text="${r.etiqueta}">Cliente</option>
+                </select>
+                <small class="text-suave">Solo se puede cambiar si el usuario no tiene reservas ni ventas.</small>
             </div>
         </div>
         <input th:unless="${rolEditable}" type="hidden" th:field="*{rol}">
@@ -87,7 +89,7 @@
 <script>
     // La sucursal solo aplica a clientes y vendedores
     function mostrarSucursal() {
-        var marcado = document.querySelector('input[name="rol"]:checked') || document.querySelector('input[name="rol"]');
+        var marcado = document.querySelector('input[name="rol"]:checked') || document.querySelector('[name="rol"]');
         var rol = marcado ? marcado.value : 'CLIENTE';
         document.getElementById('campo-sucursal').style.display =
             (rol === 'CLIENTE' || rol === 'VENDEDOR') ? '' : 'none';

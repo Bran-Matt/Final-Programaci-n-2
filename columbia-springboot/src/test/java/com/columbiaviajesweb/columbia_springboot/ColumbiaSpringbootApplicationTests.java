@@ -2,6 +2,7 @@ package com.columbiaviajesweb.columbia_springboot;
 
 import com.columbiaviajesweb.columbia_springboot.dto.RankingVendedor;
 import com.columbiaviajesweb.columbia_springboot.dto.ReservaForm;
+import com.columbiaviajesweb.columbia_springboot.dto.UsuarioForm;
 import com.columbiaviajesweb.columbia_springboot.entity.*;
 import com.columbiaviajesweb.columbia_springboot.exception.ReglaNegocioException;
 import com.columbiaviajesweb.columbia_springboot.service.*;
@@ -33,6 +34,35 @@ class ColumbiaSpringbootApplicationTests {
         Usuario duenio = usuarioService.autenticar("duenio", "1234").orElseThrow();
         assertInstanceOf(Duenio.class, duenio);
         assertEquals("/duenio/ranking", duenio.getPaginaInicio());
+    }
+
+    @Test
+    void cambioDeRolDeUnUsuario() {
+        UsuarioForm f = new UsuarioForm();
+        f.setRol(Rol.ADMINISTRADOR);
+        f.setCodigo("temporal");
+        f.setClave("abcd");
+        f.setNombre("Tomi");
+        f.setApellidos("Prueba");
+        Usuario creado = usuarioService.guardar(f);
+
+        // Sin reservas: pasa a ser vendedor y conserva la clave
+        UsuarioForm edicion = UsuarioForm.desde(creado);
+        edicion.setRol(Rol.VENDEDOR);
+        Usuario cambiado = usuarioService.guardar(edicion, null);
+        assertInstanceOf(Vendedor.class, cambiado);
+        assertInstanceOf(Vendedor.class, usuarioService.autenticar("temporal", "abcd").orElseThrow());
+
+        // Con reservas no se permite
+        Usuario cliente = usuarioService.autenticar("cliente1", "1234").orElseThrow();
+        UsuarioForm conReservas = UsuarioForm.desde(cliente);
+        conReservas.setRol(Rol.VENDEDOR);
+        assertThrows(ReglaNegocioException.class, () -> usuarioService.guardar(conReservas, null));
+
+        // Nadie puede cambiar su propio rol
+        UsuarioForm propio = UsuarioForm.desde(cambiado);
+        propio.setRol(Rol.CLIENTE);
+        assertThrows(ReglaNegocioException.class, () -> usuarioService.guardar(propio, cambiado));
     }
 
     @Test
