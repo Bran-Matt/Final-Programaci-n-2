@@ -1,39 +1,38 @@
 package com.columbiaviajesweb.columbia_springboot.entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import javax.persistence.*;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * Entidad Vendedor que hereda de Usuario
- * Maneja facturación y gestión de clientes
+ * Vendedor de una sucursal. Administra clientes y reservas, y factura por cada reserva que hace.
  */
 @Entity
 @Table(name = "vendedores")
-@Data
-@EqualsAndHashCode(callSuper = true)
-@PrimaryKeyJoinColumn(name = "usuario_id")
+@Getter
+@Setter
 public class Vendedor extends Usuario {
-    
-    @Column(name = "facturacion")
-    private Float facturacion = 0.0f;
-    
-    public Vendedor() {
-        super();
+
+    @ManyToOne
+    @JoinColumn(name = "sucursal_id")
+    private Sucursal sucursal;
+
+    @OneToMany(mappedBy = "vendedor")
+    private List<Reserva> reservas = new ArrayList<>();
+
+    @Override public Rol getRol() { return Rol.VENDEDOR; }
+    @Override public String getPaginaInicio() { return "/panel"; }
+    @Override public boolean puedeGestionarReservas() { return true; }
+
+    /** Total facturado: suma polimórfica del importe de cada reserva vendida. */
+    public double getTotalFacturado() {
+        return reservas.stream().mapToDouble(Reserva::getImporte).sum();
     }
-    
-    public Vendedor(String nombre, String apellido, String codigoUsuario, 
-                    String clave, String direccion, String email, String telefono) {
-        super(nombre, apellido, codigoUsuario, clave, "VENDEDOR", direccion, email, telefono);
-    }
-    
-    /**
-     * Incrementa la facturación del vendedor
-     */
-    public void agregarFacturacion(Float monto) {
-        if (this.facturacion == null) {
-            this.facturacion = 0.0f;
-        }
-        this.facturacion += monto;
+
+    public int getCantidadReservas() {
+        return reservas.size();
     }
 }

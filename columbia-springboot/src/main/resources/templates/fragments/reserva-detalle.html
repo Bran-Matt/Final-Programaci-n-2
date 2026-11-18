@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Panel lateral con todo el detalle de una reserva. Se abre con data-bs-target="#reserva-{id}" -->
+<div th:fragment="detalle(r)" class="offcanvas offcanvas-end cv-detalle" th:classappend="${r.tipo == 'Vuelo'} ? 'vuelo' : 'hotel'"
+     tabindex="-1" th:id="'reserva-' + ${r.id}" th:attr="aria-labelledby='titulo-reserva-' + ${r.id}">
+    <div class="offcanvas-header">
+        <div class="d-flex gap-3 align-items-center">
+            <span class="cv-icono" style="background: rgba(255,255,255,.18); color: #fff"><i class="bi" th:classappend="${r.icono}"></i></span>
+            <div>
+                <small class="opacity-75" th:text="'Reserva de ' + ${r.tipo.toLowerCase()} + ' · ' + ${r.codigo}"></small>
+                <h5 class="fw-bold m-0" th:id="'titulo-reserva-' + ${r.id}" th:text="${r.descripcion}"></h5>
+            </div>
+        </div>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+    <div class="offcanvas-body">
+        <div class="d-flex justify-content-between align-items-baseline mb-4">
+            <span class="text-suave">Importe total</span>
+            <span class="fs-3 fw-bold" th:text="'$ ' + ${#numbers.formatDecimal(r.importe, 1, 'POINT', 0, 'COMMA')}"></span>
+        </div>
+
+        <div class="seccion" th:if="${r.tipo == 'Vuelo'}">
+            <h6><i class="bi bi-airplane me-1"></i>Vuelo</h6>
+            <dl>
+                <dt>Número</dt><dd th:text="${r.vuelo.numero}"></dd>
+                <dt>Ruta</dt><dd th:text="${r.vuelo.ruta}"></dd>
+                <dt>Salida</dt><dd th:text="${#temporals.format(r.vuelo.fechaHora, 'dd/MM/yyyy · HH:mm')}"></dd>
+                <dt>Clase</dt><dd th:text="${r.clase.etiqueta}"></dd>
+                <dt>Precio del pasaje</dt><dd th:text="'$ ' + ${#numbers.formatDecimal(r.importe, 1, 'POINT', 0, 'COMMA')}"></dd>
+            </dl>
+        </div>
+
+        <div class="seccion" th:if="${r.tipo == 'Hotel'}">
+            <h6><i class="bi bi-building me-1"></i>Hospedaje</h6>
+            <dl>
+                <dt>Hotel</dt><dd th:text="${r.hotel.nombre}"></dd>
+                <dt>Dirección</dt><dd th:text="${r.hotel.direccion} + ', ' + ${r.hotel.ciudad}"></dd>
+                <dt>Teléfono</dt><dd th:text="${r.hotel.telefono}"></dd>
+                <dt>Llegada</dt><dd th:text="${#temporals.format(r.fechaLlegada, 'dd/MM/yyyy')}"></dd>
+                <dt>Partida</dt><dd th:text="${#temporals.format(r.fechaPartida, 'dd/MM/yyyy')}"></dd>
+                <dt>Noches</dt><dd th:text="${r.noches}"></dd>
+                <dt>Régimen</dt><dd th:text="${r.regimen.etiqueta}"></dd>
+                <dt>Precio por noche</dt><dd th:text="'$ ' + ${#numbers.formatDecimal(r.hotel.precioNoche, 1, 'POINT', 0, 'COMMA')}"></dd>
+            </dl>
+        </div>
+
+        <div class="seccion">
+            <h6><i class="bi bi-person me-1"></i>Turista</h6>
+            <div class="d-flex align-items-center gap-2 mb-3">
+                <img class="cv-avatar" th:attr="data-blobatar=${r.cliente.codigo}" alt="">
+                <div>
+                    <div class="fw-semibold" th:text="${r.cliente.nombreCompleto}"></div>
+                    <small class="text-suave" th:text="'Código ' + ${r.cliente.codigo}"></small>
+                </div>
+            </div>
+            <dl>
+                <dt>E-mail</dt><dd th:text="${r.cliente.email}"></dd>
+                <dt>Teléfono</dt><dd th:text="${r.cliente.telefono}"></dd>
+                <dt>Sucursal</dt><dd th:text="${r.cliente.sucursal != null} ? ${r.cliente.sucursal.codigo} : '—'"></dd>
+            </dl>
+        </div>
+
+        <div class="seccion">
+            <h6><i class="bi bi-receipt me-1"></i>Venta</h6>
+            <dl>
+                <dt>Fecha de reserva</dt><dd th:text="${#temporals.format(r.fechaReserva, 'dd/MM/yyyy HH:mm')}"></dd>
+                <dt>Vendedor</dt><dd th:text="${r.vendedor != null} ? ${r.vendedor.nombreCompleto} : '—'"></dd>
+            </dl>
+        </div>
+
+        <a th:if="${usuarioActual.puedeGestionarReservas()}" th:href="@{/gestion/reservas/{id}/editar(id=${r.id})}"
+           class="btn btn-primary w-100"><i class="bi bi-pencil me-1"></i>Editar reserva</a>
+    </div>
+</div>
+</body>
+</html>

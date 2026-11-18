@@ -1,54 +1,100 @@
 package com.columbiaviajesweb.columbia_springboot.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import javax.persistence.*;
-import java.io.Serializable;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.time.LocalDateTime;
 
 /**
- * Entidad Vuelo representa un vuelo regular contratado por la cadena
+ * Vuelo regular contratado en exclusiva por la cadena.
+ * Las plazas de primera clase son las plazas totales menos las de clase turista.
  */
 @Entity
 @Table(name = "vuelos")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Vuelo implements Serializable {
-    
+@Getter
+@Setter
+public class Vuelo {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(name = "numero_vuelo", unique = true, nullable = false)
-    private Integer numeroVuelo;
-    
-    @Column(name = "fecha", length = 50)
-    private String fecha;
-    
-    @Column(name = "origen", length = 100)
+
+    @NotBlank(message = "El número de vuelo es obligatorio")
+    @Size(max = 10)
+    @Column(nullable = false, unique = true, length = 10)
+    private String numero;
+
+    @NotNull(message = "Indicá fecha y hora")
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm")
+    @Column(nullable = false)
+    private LocalDateTime fechaHora;
+
+    @NotBlank(message = "El origen es obligatorio")
+    @Column(nullable = false, length = 80)
     private String origen;
-    
-    @Column(name = "destino", length = 100)
+
+    @NotBlank(message = "El destino es obligatorio")
+    @Column(nullable = false, length = 80)
     private String destino;
-    
-    @Column(name = "plazas_totales")
+
+    @NotNull(message = "Indicá las plazas totales")
+    @Min(value = 1, message = "Debe tener al menos 1 plaza")
+    @Column(nullable = false)
     private Integer plazasTotales;
-    
-    @Column(name = "plazas_turista")
+
+    @NotNull(message = "Indicá las plazas de clase turista")
+    @PositiveOrZero
+    @Column(nullable = false)
     private Integer plazasTurista;
-    
-    @Column(name = "precio")
-    private Float precio;
-    
-    public Vuelo(Integer numeroVuelo, String fecha, String origen, String destino, 
-                 Integer plazasTotales, Integer plazasTurista, Float precio) {
-        this.numeroVuelo = numeroVuelo;
-        this.fecha = fecha;
+
+    @NotNull(message = "Indicá el precio")
+    @PositiveOrZero
+    @Column(nullable = false)
+    private Double precioTurista;
+
+    @NotNull(message = "Indicá el precio")
+    @PositiveOrZero
+    @Column(nullable = false)
+    private Double precioPrimera;
+
+    public Vuelo() { }
+
+    public Vuelo(String numero, LocalDateTime fechaHora, String origen, String destino,
+                 int plazasTotales, int plazasTurista, double precioTurista, double precioPrimera) {
+        this.numero = numero;
+        this.fechaHora = fechaHora;
         this.origen = origen;
         this.destino = destino;
         this.plazasTotales = plazasTotales;
         this.plazasTurista = plazasTurista;
-        this.precio = precio;
+        this.precioTurista = precioTurista;
+        this.precioPrimera = precioPrimera;
+    }
+
+    public int getPlazasPrimera() {
+        if (plazasTotales == null || plazasTurista == null) return 0;
+        return plazasTotales - plazasTurista;
+    }
+
+    /** Plazas que tiene el vuelo en la clase indicada. */
+    public int getPlazas(ClaseVuelo clase) {
+        return clase == ClaseVuelo.TURISTA ? plazasTurista : getPlazasPrimera();
+    }
+
+    /** Precio del pasaje en la clase indicada. */
+    public double getPrecio(ClaseVuelo clase) {
+        return clase == ClaseVuelo.TURISTA ? precioTurista : precioPrimera;
+    }
+
+    @AssertTrue(message = "Las plazas de clase turista no pueden superar las plazas totales")
+    public boolean isPlazasValidas() {
+        return plazasTotales == null || plazasTurista == null || plazasTurista <= plazasTotales;
+    }
+
+    public String getRuta() {
+        return origen + " → " + destino;
     }
 }

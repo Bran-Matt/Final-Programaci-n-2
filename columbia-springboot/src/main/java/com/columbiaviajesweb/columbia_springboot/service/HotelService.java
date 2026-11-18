@@ -1,31 +1,32 @@
 package com.columbiaviajesweb.columbia_springboot.service;
 
-import com.columbiaviajes.entity.Hotel;
-import com.columbiaviajes.repository.HotelRepository;
-import lombok.RequiredArgsConstructor;
+import com.columbiaviajesweb.columbia_springboot.entity.Hotel;
+import com.columbiaviajesweb.columbia_springboot.exception.ReglaNegocioException;
+import com.columbiaviajesweb.columbia_springboot.repository.HotelRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
-public class HotelService {
-    
-    private final HotelRepository hotelRepository;
-    
-    public List<Hotel> obtenerTodos() {
-        return hotelRepository.findAll();
+@Transactional
+public class HotelService extends ServicioBase<Hotel> {
+
+    private final HotelRepository repo;
+
+    public HotelService(HotelRepository repo) { this.repo = repo; }
+
+    @Override protected JpaRepository<Hotel, Long> repositorio() { return repo; }
+    @Override protected String nombreEntidad() { return "el hotel"; }
+
+    @Override
+    protected void validar(Hotel h) {
+        if (repo.existsByCodigoIgnoreCaseAndIdNot(h.getCodigo(), idONinguno(h.getId()))) {
+            throw new ReglaNegocioException("Ya existe un hotel con el código " + h.getCodigo());
+        }
     }
-    
-    public Optional<Hotel> buscarPorNombre(String nombre) {
-        return hotelRepository.findByNombre(nombre);
-    }
-    
-    public Hotel guardarHotel(Hotel hotel) {
-        return hotelRepository.save(hotel);
-    }
-    
-    public boolean existeHotel(String nombre) {
-        return hotelRepository.existsByNombre(nombre);
-    }
+
+    @Override
+    public List<Hotel> listar() { return repo.findAllByOrderByCiudadAscNombreAsc(); }
 }

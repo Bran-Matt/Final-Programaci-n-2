@@ -1,40 +1,43 @@
 package com.columbiaviajesweb.columbia_springboot.entity;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
-import javax.persistence.*;
-import java.io.Serializable;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * Entidad Sucursal representa una sucursal de la cadena de agencias
+ * Sucursal de la cadena de agencias.
  */
 @Entity
 @Table(name = "sucursales")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class Sucursal implements Serializable {
-    
+@Getter
+@Setter
+public class Sucursal {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
-    @Column(name = "codigo", unique = true, nullable = false, length = 10)
+
+    @NotBlank(message = "El código es obligatorio")
+    @Size(max = 10)
+    @Column(nullable = false, unique = true, length = 10)
     private String codigo;
-    
-    @Column(name = "direccion", nullable = false, length = 200)
+
+    @NotBlank(message = "La dirección es obligatoria")
+    @Column(nullable = false, length = 150)
     private String direccion;
-    
-    @Column(name = "email", length = 100)
+
+    @Email(message = "E-mail inválido")
+    @Column(length = 100)
     private String email;
-    
-    @Column(name = "telefono", length = 20)
+
+    @Column(length = 30)
     private String telefono;
-    
-    /**
-     * Constructor para crear sucursales sin ID
-     */
+
+    public Sucursal() { }
+
     public Sucursal(String codigo, String direccion, String email, String telefono) {
         this.codigo = codigo;
         this.direccion = direccion;
