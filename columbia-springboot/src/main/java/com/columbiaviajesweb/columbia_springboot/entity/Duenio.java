@@ -1,33 +1,16 @@
 package com.columbiaviajesweb.columbia_springboot.entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import javax.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 /**
- * Entidad Dueño que hereda de Usuario
- * Representa al dueño de la cadena de agencias
- * Puede realizar todas las operaciones administrativas
+ * Dueño de la cadena: consulta el listado de vendedores ordenado por facturación.
  */
 @Entity
 @Table(name = "duenios")
-@Data
-@EqualsAndHashCode(callSuper = true)
-@PrimaryKeyJoinColumn(name = "usuario_id")
 public class Duenio extends Usuario {
-    
-    /**
-     * Constructor por defecto requerido por JPA
-     */
-    public Duenio() {
-        super();
-    }
-    
-    /**
-     * Constructor completo para crear un Dueño
-     */
-    public Duenio(String nombre, String apellido, String codigoUsuario, 
-                  String clave, String direccion, String email, String telefono) {
-        super(nombre, apellido, codigoUsuario, clave, "DUENIO", direccion, email, telefono);
-    }
+
+    @Override public Rol getRol() { return Rol.DUENIO; }
+    @Override public String getPaginaInicio() { return "/duenio/ranking"; }
+    @Override public boolean puedeVerRanking() { return true; }
 }
