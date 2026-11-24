@@ -111,6 +111,26 @@ La primera vez que arranca, la app carga datos de ejemplo. **Todos tienen la cla
 - **Para empezar de cero:** apagá la app (Ctrl + C) y borrá la carpeta `columbia-springboot\data`. La próxima vez que arranque se vuelve a crear.
 - Esa carpeta no se sube a GitHub, así que cada computadora tiene su propia base.
 
+### Ver la base desde el navegador (consola de H2)
+
+No hace falta phpMyAdmin (ese es solo para MySQL). La app trae la **consola de H2**:
+
+1. Con la app corriendo, entrá a **http://localhost:8080/h2-console**
+2. En la pantalla de ingreso completá así:
+
+   | Campo | Qué poner |
+   |---|---|
+   | Driver Class | `org.h2.Driver` (ya viene puesto) |
+   | JDBC URL | `jdbc:h2:file:./data/columbia;AUTO_SERVER=TRUE` |
+   | User Name | `sa` |
+   | Password | *(dejalo vacío)* |
+
+3. Tocá **Connect**. A la izquierda vas a ver las tablas (`USUARIOS`, `VUELOS`, `HOTELES`, `RESERVAS`, etc.).
+4. Hacé clic en una tabla (o escribí por ejemplo `SELECT * FROM VUELOS`) y tocá **Run** para ver los datos.
+
+> La consola solo se puede abrir desde la misma computadora donde corre la app.
+> Si en JDBC URL aparece otra cosa (por ejemplo `jdbc:h2:~/test`), borrala y poné la de arriba; si no, abre una base vacía.
+
 ---
 
 ## 6. Problemas comunes
