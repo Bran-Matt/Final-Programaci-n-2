@@ -151,3 +151,67 @@ cd $HOME\Documents\final-programaci-n-2\columbia-springboot
 ```
 
 Abrir http://localhost:8080 · entrar con `admin` / `1234` · apagar con Ctrl + C.
+
+---
+
+# CMD
+
+Para una compu donde **no se puede instalar nada** (por ejemplo la del instituto, donde winget y Git están bloqueados). Java y el proyecto se bajan como zip, así que no hace falta ser administrador.
+
+Abrí **cmd** (tecla Windows → escribí `cmd` → Enter) y pegá **de a una línea**, esperando a que termine cada una.
+
+### 1. Ir a Documentos
+
+```
+cd %USERPROFILE%\Documents
+```
+
+### 2. Bajar Java 21 y descomprimirlo
+
+```
+curl -L -o jdk.zip https://api.adoptium.net/v3/binary/latest/21/ga/windows/x64/jdk/hotspot/normal/eclipse
+```
+
+```
+tar -xf jdk.zip
+```
+
+### 3. Decirle a esta ventana dónde está Java
+
+```
+for /d %i in (jdk-21*) do set "JAVA_HOME=%CD%\%i"
+```
+
+```
+set "PATH=%JAVA_HOME%\bin;%PATH%"
+```
+
+```
+java -version
+```
+
+Tiene que decir 21.
+
+### 4. Bajar el proyecto (sin Git)
+
+```
+curl -L -o proyecto.zip https://github.com/bran-matt/final-programaci-n-2/archive/refs/heads/main.zip
+```
+
+```
+tar -xf proyecto.zip
+```
+
+### 5. Correrlo
+
+```
+cd final-programaci-n-2-main\columbia-springboot
+```
+
+```
+mvnw.cmd spring-boot:run
+```
+
+Cuando aparezca `Started ColumbiaSpringbootApplication`, entrá a http://localhost:8080 con `admin` / `1234`.
+
+> **Si cerrás el cmd**, Java deja de estar configurado. La próxima vez repetí los pasos **1** y **3**, y después el **5**.
