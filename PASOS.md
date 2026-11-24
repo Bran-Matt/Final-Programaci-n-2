@@ -235,3 +235,104 @@ mvnw.cmd spring-boot:run
 Cuando aparezca `Started ColumbiaSpringbootApplication`, entrá a http://localhost:8080 con `admin` / `1234`.
 
 > **Si cerrás el cmd**, Java deja de estar configurado. La próxima vez repetí los pasos **1** y **3**, y después el **5**.
+
+---
+
+# Presentación en varias compus (base, backend y frontend separados)
+
+Para mostrar cada parte en una compu distinta. Todas tienen que estar **en la misma red** (por ejemplo el wifi o la red del cole).
+
+| Compu | Qué muestra | Qué corre |
+|---|---|---|
+| **A** | Base de datos | XAMPP con MySQL (puerto **3306**) y phpMyAdmin |
+| **B** | Backend | La app de Spring Boot (puerto **8080**) |
+| **C** (o la misma B) | Frontend | Solo el navegador |
+
+> Normalmente la app corre solo en tu compu (`localhost`). Con el comando de abajo queda abierta a la red **solo mientras la tenés corriendo**; cuando la cerrás, vuelve a ser como siempre.
+
+## Compu A: la base de datos (XAMPP)
+
+1. Abrí el **XAMPP Control Panel** y tocá **Start** en **Apache** y en **MySQL**.
+2. Entrá a http://localhost/phpmyadmin, abrí la pestaña **SQL**, pegá esto y tocá **Continuar**:
+
+   ```
+   CREATE DATABASE IF NOT EXISTS columbia_viajes;
+   CREATE USER 'columbia'@'%' IDENTIFIED BY '1234';
+   GRANT ALL ON columbia_viajes.* TO 'columbia'@'%';
+   ```
+
+   - Si dice que el **usuario ya existe**: borrá todo del cuadro y pegá solo la línea del `GRANT`.
+   - Si aparece el **error #1034** (una tabla interna de XAMPP está rota): borrá todo, pegá esto, tocá **Continuar** y después volvé a pegar solo el `GRANT`:
+
+     ```
+     REPAIR TABLE mysql.db;
+     FLUSH PRIVILEGES;
+     ```
+
+3. Abrí **cmd**, escribí `ipconfig` y anotá la **Dirección IPv4** (por ejemplo `192.168.1.20`). Esa es la **IP_A**.
+4. Dejá XAMPP abierto durante toda la presentación.
+
+Las tablas no hace falta crearlas: la app las crea sola la primera vez que se conecta, con los datos de ejemplo.
+
+## Compu B: el backend (la app)
+
+Abrí **cmd** y pegá **de a una línea** (si en esta compu todavía no bajaste Java y el proyecto, hacé antes los pasos de la sección **CMD**):
+
+```
+cd %USERPROFILE%\Documents
+```
+
+```
+for /d %i in (jdk-21*) do set "JAVA_HOME=%CD%\%i"
+```
+
+```
+set "PATH=%JAVA_HOME%\bin;%PATH%"
+```
+
+```
+cd final-programaci-n-2-main\columbia-springboot
+```
+
+Y esta, **todo en una sola línea**, cambiando `IP_A` por la IP que anotaste en la compu A:
+
+```
+mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=mysql "-Dspring-boot.run.arguments=--server.address=0.0.0.0 --spring.datasource.url=jdbc:mysql://IP_A:3306/columbia_viajes --spring.datasource.username=columbia --spring.datasource.password=1234"
+```
+
+Qué hace cada parte:
+
+- `profiles=mysql`: usa MySQL en vez de H2.
+- `server.address=0.0.0.0`: deja que otras compus de la red entren a la app.
+- `datasource.url=...IP_A:3306...`: se conecta a la base de la compu A.
+
+Cuando aparezca `Started ColumbiaSpringbootApplication`:
+
+- Si Windows pregunta por el **firewall**, tocá **Permitir**.
+- Abrí **otro** cmd, escribí `ipconfig` y anotá la Dirección IPv4 de esta compu. Esa es la **IP_B**.
+
+## Compu C (o la misma B): el frontend
+
+Abrí el navegador y entrá a:
+
+```
+http://IP_B:8080
+```
+
+(cambiando `IP_B` por la IP de la compu B). Ingresá con `admin` / `1234` o cualquiera de los usuarios de prueba.
+
+Para mostrar que los datos se guardan en la base: hacé una reserva desde el navegador y después, en la compu A, abrí la tabla `reservas` en phpMyAdmin.
+
+## Si algo falla
+
+**"Communications link failure" o "Connection refused" en la compu B**
+La app no llega a la base. Revisá que MySQL esté en verde en XAMPP, que `IP_A` esté bien escrita y que las dos compus estén en la misma red. Si en la compu A Windows preguntó por el firewall, tiene que estar en **Permitir**. Si las compus del cole no te dejan cambiar el firewall, lo tiene que habilitar el profe (puerto 3306 en la compu A y 8080 en la B).
+
+**"Access denied for user 'columbia'"**
+Falta el usuario o el permiso. Volvé a correr en phpMyAdmin la línea del `GRANT` (y si hace falta, el `REPAIR TABLE` de arriba).
+
+**Desde la compu C no abre `http://IP_B:8080`**
+Fijate primero que en la misma compu B abra `http://localhost:8080`. Si ahí anda pero desde C no, es el firewall de la compu B o que no están en la misma red.
+
+**Plan B (si no se pueden conectar las compus entre sí)**
+Corré la app en la misma compu que XAMPP (base y backend juntos), con `jdbc:mysql://localhost:3306/columbia_viajes` en lugar de `IP_A`, y mostrá el frontend desde otra compu con el navegador en `http://IP_de_esa_compu:8080`.
