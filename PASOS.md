@@ -257,17 +257,22 @@ Para mostrar cada parte en una compu distinta. Todas tienen que estar **en la mi
 
    ```
    CREATE DATABASE IF NOT EXISTS columbia_viajes;
-   CREATE USER 'columbia'@'%' IDENTIFIED BY '1234';
+   CREATE USER IF NOT EXISTS 'columbia'@'%' IDENTIFIED BY '1234';
    GRANT ALL ON columbia_viajes.* TO 'columbia'@'%';
+   FLUSH PRIVILEGES;
    ```
 
-   - Si dice que el **usuario ya existe**: borrá todo del cuadro y pegá solo la línea del `GRANT`.
-   - Si aparece el **error #1034** (una tabla interna de XAMPP está rota): borrá todo, pegá esto, tocá **Continuar** y después volvé a pegar solo el `GRANT`:
+   Se puede correr las veces que haga falta: si la base o el usuario ya existen, no pasa nada.
+
+   - **Si salió bien** (cartel verde), seguí con el paso 3.
+   - **Si aparece el error #1034** (una tabla interna de XAMPP está rota): borrá todo del cuadro, pegá esto y tocá **Continuar**:
 
      ```
      REPAIR TABLE mysql.db;
      FLUSH PRIVILEGES;
      ```
+
+     Después volvé a pegar **el código de arriba completo**, tocá **Continuar** y, cuando salga bien, seguí con el paso 3.
 
 3. Abrí **cmd**, escribí `ipconfig` y anotá la **Dirección IPv4** (por ejemplo `192.168.1.20`). Esa es la **IP_A**.
 4. Dejá XAMPP abierto durante toda la presentación.
