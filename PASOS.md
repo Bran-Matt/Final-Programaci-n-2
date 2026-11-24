@@ -341,3 +341,65 @@ Fijate primero que en la misma compu B abra `http://localhost:8080`. Si ahí and
 
 **Plan B (si no se pueden conectar las compus entre sí)**
 Corré la app en la misma compu que XAMPP (base y backend juntos), con `jdbc:mysql://localhost:3306/columbia_viajes` en lugar de `IP_A`, y mostrá el frontend desde otra compu con el navegador en `http://IP_de_esa_compu:8080`.
+
+---
+
+# ¿localhost o IP? (y la versión todo en una compu)
+
+## Qué significa localhost
+
+**`localhost` siempre quiere decir "esta misma compu"**, la compu donde lo escribís.
+
+- Si en la compu B escribís `localhost:3306`, la app busca MySQL **en la compu B**, no en la A.
+- Si en la compu C abrís `http://localhost:8080`, el navegador busca la app **en la compu C**, y como ahí no está corriendo, no abre nada.
+
+Por eso, cuando cada parte está en **una compu distinta**, hay que usar la **IP** de la otra compu (`IP_A`, `IP_B`). Así funcionan las redes, no es algo de la app.
+
+Regla fácil: **si el programa está en la misma compu, va `localhost`; si está en otra, va la IP.**
+
+| Desde... | Hacia... | Qué se pone |
+|---|---|---|
+| Compu B (app) | Base en la compu A | `IP_A:3306` |
+| Compu C (navegador) | App en la compu B | `http://IP_B:8080` |
+| Compu B (navegador) | App en la misma B | `http://localhost:8080` |
+
+## Versión todo en una compu (todo con localhost)
+
+Si alcanza con mostrar las tres partes por separado, cada una en su puerto, se puede hacer todo en **una sola compu** usando `localhost` en todos lados. Es más simple: no hace falta sacar IPs ni tocar el firewall.
+
+| Parte | Programa | Dónde se ve |
+|---|---|---|
+| Base de datos | XAMPP con MySQL (puerto **3306**) | http://localhost/phpmyadmin |
+| Backend | La app de Spring Boot (puerto **8080**) | La ventana de cmd donde corre |
+| Frontend | El navegador | http://localhost:8080 |
+
+### Pasos
+
+1. **Base:** abrí XAMPP, tocá **Start** en **Apache** y **MySQL**, y en phpMyAdmin corré el SQL del punto 2 de la sección anterior (el de la compu A).
+2. **Backend:** abrí cmd y pegá de a una línea:
+
+   ```
+   cd %USERPROFILE%\Documents
+   ```
+
+   ```
+   for /d %i in (jdk-21*) do set "JAVA_HOME=%CD%\%i"
+   ```
+
+   ```
+   set "PATH=%JAVA_HOME%\bin;%PATH%"
+   ```
+
+   ```
+   cd final-programaci-n-2-main\columbia-springboot
+   ```
+
+   ```
+   mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=mysql "-Dspring-boot.run.arguments=--spring.datasource.url=jdbc:mysql://localhost:3306/columbia_viajes --spring.datasource.username=columbia --spring.datasource.password=1234"
+   ```
+
+   Esperá a que aparezca `Started ColumbiaSpringbootApplication`.
+
+3. **Frontend:** abrí el navegador en **http://localhost:8080** y entrá con `admin` / `1234`.
+
+Para mostrar que los datos se guardan: hacé una reserva en el navegador y después abrí la tabla `reservas` en phpMyAdmin.
