@@ -253,18 +253,19 @@ Para mostrar cada parte en una compu distinta. Todas tienen que estar **en la mi
 ## Compu BDD: la base de datos (XAMPP)
 
 1. Abrí el **XAMPP Control Panel** y tocá **Start** en **Apache** y en **MySQL**.
-2. Entrá a http://localhost/phpmyadmin, abrí la pestaña **SQL**, pegá esto y tocá **Continuar**:
+2. Entrá a http://localhost/phpmyadmin. Tocá **Servidor: 127.0.0.1** arriba (para estar en el general y no dentro de una base), abrí la pestaña **SQL**, pegá esto y tocá **Continuar** (abajo a la derecha):
 
    ```
-   CREATE DATABASE IF NOT EXISTS columbia_viajes;
+   CREATE DATABASE IF NOT EXISTS columbia_final;
    CREATE USER IF NOT EXISTS 'columbia'@'%' IDENTIFIED BY '1234';
-   GRANT ALL ON columbia_viajes.* TO 'columbia'@'%';
+   GRANT ALL ON columbia_final.* TO 'columbia'@'%';
    FLUSH PRIVILEGES;
    ```
 
    Se puede correr las veces que haga falta: si la base o el usuario ya existen, no pasa nada.
 
-   - **Si salió bien** (cartel verde), seguí con el paso 3.
+   - **Si salió bien** (cartel verde), fijate que en la lista de la izquierda aparezca **columbia_final** (si no, apretá F5) y seguí con el paso 3.
+   - Usamos `columbia_final` y no `columbia_viajes` porque en las compus del cole puede haber una `columbia_viajes` vieja, de otra versión del proyecto, con tablas que chocan con la app nueva.
    - **Si aparece el error #1034** (una tabla interna de XAMPP está rota): borrá todo del cuadro, pegá esto y tocá **Continuar**:
 
      ```
@@ -275,6 +276,7 @@ Para mostrar cada parte en una compu distinta. Todas tienen que estar **en la mi
      Después volvé a pegar **el código de arriba completo**, tocá **Continuar** y, cuando salga bien, seguí con el paso 3.
 
 3. Abrí **cmd**, escribí `ipconfig` y anotá la **Dirección IPv4** (por ejemplo `192.168.1.20`). Esa es la **IP_BDD**.
+   Ojo: tiene que salir del `ipconfig` **de la compu BDD**, no de la del back. Si hay varios adaptadores, usá el que dice **Ethernet** (o Wi-Fi si estás por wifi).
 4. Dejá XAMPP abierto durante toda la presentación.
 
 Las tablas no hace falta crearlas: la app las crea sola la primera vez que se conecta, con los datos de ejemplo.
@@ -299,11 +301,15 @@ set "PATH=%JAVA_HOME%\bin;%PATH%"
 cd final-programaci-n-2-main\columbia-springboot
 ```
 
+Antes de correr la app, fijate que Java esté listo con `java -version` (tiene que decir 21). Si dice que no reconoce el comando, hacé los pasos 2 y 3 de la sección **CMD**.
+
 Y esta, **todo en una sola línea**, cambiando `IP_BDD` por la IP que anotaste en la compu BDD (tiene que quedar algo como `jdbc:mysql://192.168.1.20:3306/...`, sin la palabra IP_BDD):
 
 ```
-mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=mysql "-Dspring-boot.run.arguments=--server.address=0.0.0.0 --spring.datasource.url=jdbc:mysql://IP_BDD:3306/columbia_viajes --spring.datasource.username=columbia --spring.datasource.password=1234"
+mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=mysql "-Dspring-boot.run.arguments=--server.address=0.0.0.0 --spring.datasource.url=jdbc:mysql://IP_BDD:3306/columbia_final --spring.datasource.username=columbia --spring.datasource.password=1234"
 ```
+
+Conviene **copiarla de acá y pegarla**, no escribirla a mano: un error de tipeo (por ejemplo `datasourse` en vez de `datasource`) hace que la app ignore el usuario y la clave.
 
 Qué hace cada parte:
 
@@ -343,14 +349,31 @@ powershell Test-NetConnection IP_BDD -Port 3306
 - `TcpTestSucceeded : True`: la red y el firewall están bien. Si la app igual falla, revisá el usuario `columbia` y el `GRANT`.
 - `TcpTestSucceeded : False`: no llega. Casi siempre es el **firewall de la compu BDD**, que bloquea el puerto 3306. Hay que permitir `mysqld.exe` (o el puerto 3306) en el Firewall de Windows de esa compu; si no tenés permisos de administrador, lo tiene que hacer el profe. También revisá que las dos compus estén en la misma red y que MySQL esté en verde en XAMPP.
 
+**"Unknown database 'columbia_final'"**
+La app ya llega a MySQL, pero la base no está creada. Volvé a correr el SQL del punto 2 de la compu BDD (asegurate de tocar **Continuar**) y fijate que `columbia_final` aparezca a la izquierda en phpMyAdmin.
+
+**"Connection refused" aunque la IP parece bien**
+- Revisá que la IP sea la de la **compu BDD** (`ipconfig` en esa compu). Si pusiste la de la compu BACK, la app busca MySQL en sí misma y no lo encuentra.
+- En la compu BDD, escribí `netstat -an | findstr 3306`. Tiene que aparecer `0.0.0.0:3306 ... LISTENING`. Si solo aparece `127.0.0.1:3306`, en XAMPP tocá **Config** (fila de MySQL) → **my.ini**, buscá `bind-address="127.0.0.1"`, ponele un `#` adelante, guardá y hacé **Stop** y **Start** en MySQL.
+
 **"Access denied for user 'columbia'"**
 Falta el usuario o el permiso. Volvé a correr en phpMyAdmin la línea del `GRANT` (y si hace falta, el `REPAIR TABLE` de arriba).
+
+**"El sistema no puede encontrar la ruta especificada" al hacer `cd final-programaci-n-2-main\columbia-springboot`**
+En esta compu todavía no está el proyecto (o la carpeta se llama distinto). Escribí `dir` para ver qué carpetas hay; si no está, hacé el paso 4 de la sección **CMD**.
+
+**"java no se reconoce como un comando"**
+En esta compu no está Java, o cerraste el cmd. Hacé los pasos 1, 2 y 3 de la sección **CMD** (si `jdk.zip` ya está bajado, alcanza con el 1 y el 3).
+
+**Hice una reserva y no aparece en phpMyAdmin**
+- Las reservas se guardan en la tabla **reservas**, no en `vuelos`.
+- Si arrancaste la app solo con `mvnw.cmd spring-boot:run` (sin el comando largo), usa la base H2 de adentro del proyecto y no la de XAMPP. Para que guarde en XAMPP tiene que arrancar con el comando largo.
 
 **Desde la compu FRONT no abre `http://IP_BACK:8080`**
 Fijate primero que en la misma compu BACK abra `http://localhost:8080`. Si ahí anda pero desde FRONT no, es el firewall de la compu BACK o que no están en la misma red.
 
 **Plan B (si no se pueden conectar las compus entre sí)**
-Corré la app en la misma compu que XAMPP (base y backend juntos), con `jdbc:mysql://localhost:3306/columbia_viajes` en lugar de `IP_BDD`, y mostrá el frontend desde otra compu con el navegador en `http://IP_de_esa_compu:8080`.
+Corré la app en la misma compu que XAMPP (base y backend juntos), con `jdbc:mysql://localhost:3306/columbia_final` en lugar de `IP_BDD`, y mostrá el frontend desde otra compu con el navegador en `http://IP_de_esa_compu:8080`.
 
 ---
 
@@ -405,7 +428,7 @@ Si alcanza con mostrar las tres partes por separado, cada una en su puerto, se p
    ```
 
    ```
-   mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=mysql "-Dspring-boot.run.arguments=--spring.datasource.url=jdbc:mysql://localhost:3306/columbia_viajes --spring.datasource.username=columbia --spring.datasource.password=1234"
+   mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=mysql "-Dspring-boot.run.arguments=--spring.datasource.url=jdbc:mysql://localhost:3306/columbia_final --spring.datasource.username=columbia --spring.datasource.password=1234"
    ```
 
    Esperá a que aparezca `Started ColumbiaSpringbootApplication`.
