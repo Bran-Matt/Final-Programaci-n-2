@@ -244,13 +244,13 @@ Para mostrar cada parte en una compu distinta. Todas tienen que estar **en la mi
 
 | Compu | Qué muestra | Qué corre |
 |---|---|---|
-| **A** | Base de datos | XAMPP con MySQL (puerto **3306**) y phpMyAdmin |
-| **B** | Backend | La app de Spring Boot (puerto **8080**) |
-| **C** (o la misma B) | Frontend | Solo el navegador |
+| **BDD** | Base de datos | XAMPP con MySQL (puerto **3306**) y phpMyAdmin |
+| **BACK** | Backend | La app de Spring Boot (puerto **8080**) |
+| **FRONT** (o la misma BACK) | Frontend | Solo el navegador |
 
 > Normalmente la app corre solo en tu compu (`localhost`). Con el comando de abajo queda abierta a la red **solo mientras la tenés corriendo**; cuando la cerrás, vuelve a ser como siempre.
 
-## Compu A: la base de datos (XAMPP)
+## Compu BDD: la base de datos (XAMPP)
 
 1. Abrí el **XAMPP Control Panel** y tocá **Start** en **Apache** y en **MySQL**.
 2. Entrá a http://localhost/phpmyadmin, abrí la pestaña **SQL**, pegá esto y tocá **Continuar**:
@@ -274,12 +274,12 @@ Para mostrar cada parte en una compu distinta. Todas tienen que estar **en la mi
 
      Después volvé a pegar **el código de arriba completo**, tocá **Continuar** y, cuando salga bien, seguí con el paso 3.
 
-3. Abrí **cmd**, escribí `ipconfig` y anotá la **Dirección IPv4** (por ejemplo `192.168.1.20`). Esa es la **IP_A**.
+3. Abrí **cmd**, escribí `ipconfig` y anotá la **Dirección IPv4** (por ejemplo `192.168.1.20`). Esa es la **IP_BDD**.
 4. Dejá XAMPP abierto durante toda la presentación.
 
 Las tablas no hace falta crearlas: la app las crea sola la primera vez que se conecta, con los datos de ejemplo.
 
-## Compu B: el backend (la app)
+## Compu BACK: el backend (la app)
 
 Abrí **cmd** y pegá **de a una línea** (si en esta compu todavía no bajaste Java y el proyecto, hacé antes los pasos de la sección **CMD**):
 
@@ -299,48 +299,58 @@ set "PATH=%JAVA_HOME%\bin;%PATH%"
 cd final-programaci-n-2-main\columbia-springboot
 ```
 
-Y esta, **todo en una sola línea**, cambiando `IP_A` por la IP que anotaste en la compu A:
+Y esta, **todo en una sola línea**, cambiando `IP_BDD` por la IP que anotaste en la compu BDD (tiene que quedar algo como `jdbc:mysql://192.168.1.20:3306/...`, sin la palabra IP_BDD):
 
 ```
-mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=mysql "-Dspring-boot.run.arguments=--server.address=0.0.0.0 --spring.datasource.url=jdbc:mysql://IP_A:3306/columbia_viajes --spring.datasource.username=columbia --spring.datasource.password=1234"
+mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=mysql "-Dspring-boot.run.arguments=--server.address=0.0.0.0 --spring.datasource.url=jdbc:mysql://IP_BDD:3306/columbia_viajes --spring.datasource.username=columbia --spring.datasource.password=1234"
 ```
 
 Qué hace cada parte:
 
 - `profiles=mysql`: usa MySQL en vez de H2.
 - `server.address=0.0.0.0`: deja que otras compus de la red entren a la app.
-- `datasource.url=...IP_A:3306...`: se conecta a la base de la compu A.
+- `datasource.url=...IP_BDD:3306...`: se conecta a la base de la compu BDD.
 
 Cuando aparezca `Started ColumbiaSpringbootApplication`:
 
 - Si Windows pregunta por el **firewall**, tocá **Permitir**.
-- Abrí **otro** cmd, escribí `ipconfig` y anotá la Dirección IPv4 de esta compu. Esa es la **IP_B**.
+- Abrí **otro** cmd, escribí `ipconfig` y anotá la Dirección IPv4 de esta compu. Esa es la **IP_BACK**.
 
-## Compu C (o la misma B): el frontend
+## Compu FRONT (o la misma BACK): el frontend
 
 Abrí el navegador y entrá a:
 
 ```
-http://IP_B:8080
+http://IP_BACK:8080
 ```
 
-(cambiando `IP_B` por la IP de la compu B). Ingresá con `admin` / `1234` o cualquiera de los usuarios de prueba.
+(cambiando `IP_BACK` por la IP de la compu BACK). Ingresá con `admin` / `1234` o cualquiera de los usuarios de prueba.
 
-Para mostrar que los datos se guardan en la base: hacé una reserva desde el navegador y después, en la compu A, abrí la tabla `reservas` en phpMyAdmin.
+Para mostrar que los datos se guardan en la base: hacé una reserva desde el navegador y después, en la compu BDD, abrí la tabla `reservas` en phpMyAdmin.
 
 ## Si algo falla
 
-**"Communications link failure" o "Connection refused" en la compu B**
-La app no llega a la base. Revisá que MySQL esté en verde en XAMPP, que `IP_A` esté bien escrita y que las dos compus estén en la misma red. Si en la compu A Windows preguntó por el firewall, tiene que estar en **Permitir**. Si las compus del cole no te dejan cambiar el firewall, lo tiene que habilitar el profe (puerto 3306 en la compu A y 8080 en la B).
+**"Communications link failure" o "Connection refused" en la compu BACK**
+La app no llega a la base. Revisá que MySQL esté en verde en XAMPP, que `IP_BDD` esté bien escrita y que las dos compus estén en la misma red. Si en la compu BDD Windows preguntó por el firewall, tiene que estar en **Permitir**. Si las compus del cole no te dejan cambiar el firewall, lo tiene que habilitar el profe (puerto 3306 en la compu BDD y 8080 en la BACK).
+
+**Cómo saber si la compu BACK llega a la base**
+En la compu BACK abrí cmd y escribí (cambiando `IP_BDD` por la IP de verdad):
+
+```
+powershell Test-NetConnection IP_BDD -Port 3306
+```
+
+- `TcpTestSucceeded : True`: la red y el firewall están bien. Si la app igual falla, revisá el usuario `columbia` y el `GRANT`.
+- `TcpTestSucceeded : False`: no llega. Casi siempre es el **firewall de la compu BDD**, que bloquea el puerto 3306. Hay que permitir `mysqld.exe` (o el puerto 3306) en el Firewall de Windows de esa compu; si no tenés permisos de administrador, lo tiene que hacer el profe. También revisá que las dos compus estén en la misma red y que MySQL esté en verde en XAMPP.
 
 **"Access denied for user 'columbia'"**
 Falta el usuario o el permiso. Volvé a correr en phpMyAdmin la línea del `GRANT` (y si hace falta, el `REPAIR TABLE` de arriba).
 
-**Desde la compu C no abre `http://IP_B:8080`**
-Fijate primero que en la misma compu B abra `http://localhost:8080`. Si ahí anda pero desde C no, es el firewall de la compu B o que no están en la misma red.
+**Desde la compu FRONT no abre `http://IP_BACK:8080`**
+Fijate primero que en la misma compu BACK abra `http://localhost:8080`. Si ahí anda pero desde FRONT no, es el firewall de la compu BACK o que no están en la misma red.
 
 **Plan B (si no se pueden conectar las compus entre sí)**
-Corré la app en la misma compu que XAMPP (base y backend juntos), con `jdbc:mysql://localhost:3306/columbia_viajes` en lugar de `IP_A`, y mostrá el frontend desde otra compu con el navegador en `http://IP_de_esa_compu:8080`.
+Corré la app en la misma compu que XAMPP (base y backend juntos), con `jdbc:mysql://localhost:3306/columbia_viajes` en lugar de `IP_BDD`, y mostrá el frontend desde otra compu con el navegador en `http://IP_de_esa_compu:8080`.
 
 ---
 
@@ -350,18 +360,18 @@ Corré la app en la misma compu que XAMPP (base y backend juntos), con `jdbc:mys
 
 **`localhost` siempre quiere decir "esta misma compu"**, la compu donde lo escribís.
 
-- Si en la compu B escribís `localhost:3306`, la app busca MySQL **en la compu B**, no en la A.
-- Si en la compu C abrís `http://localhost:8080`, el navegador busca la app **en la compu C**, y como ahí no está corriendo, no abre nada.
+- Si en la compu BACK escribís `localhost:3306`, la app busca MySQL **en la compu BACK**, no en la BDD.
+- Si en la compu FRONT abrís `http://localhost:8080`, el navegador busca la app **en la compu FRONT**, y como ahí no está corriendo, no abre nada.
 
-Por eso, cuando cada parte está en **una compu distinta**, hay que usar la **IP** de la otra compu (`IP_A`, `IP_B`). Así funcionan las redes, no es algo de la app.
+Por eso, cuando cada parte está en **una compu distinta**, hay que usar la **IP** de la otra compu (`IP_BDD`, `IP_BACK`). Así funcionan las redes, no es algo de la app.
 
 Regla fácil: **si el programa está en la misma compu, va `localhost`; si está en otra, va la IP.**
 
 | Desde... | Hacia... | Qué se pone |
 |---|---|---|
-| Compu B (app) | Base en la compu A | `IP_A:3306` |
-| Compu C (navegador) | App en la compu B | `http://IP_B:8080` |
-| Compu B (navegador) | App en la misma B | `http://localhost:8080` |
+| Compu BACK (app) | Base en la compu BDD | `IP_BDD:3306` |
+| Compu FRONT (navegador) | App en la compu BACK | `http://IP_BACK:8080` |
+| Compu BACK (navegador) | App en la misma BACK | `http://localhost:8080` |
 
 ## Versión todo en una compu (todo con localhost)
 
@@ -375,7 +385,7 @@ Si alcanza con mostrar las tres partes por separado, cada una en su puerto, se p
 
 ### Pasos
 
-1. **Base:** abrí XAMPP, tocá **Start** en **Apache** y **MySQL**, y en phpMyAdmin corré el SQL del punto 2 de la sección anterior (el de la compu A).
+1. **Base:** abrí XAMPP, tocá **Start** en **Apache** y **MySQL**, y en phpMyAdmin corré el SQL del punto 2 de la sección anterior (el de la compu BDD).
 2. **Backend:** abrí cmd y pegá de a una línea:
 
    ```
